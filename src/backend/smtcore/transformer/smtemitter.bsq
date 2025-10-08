@@ -1272,7 +1272,8 @@ function emitBuiltinFunctionDecl(f: SMTAssembly::BuiltinFunctionDecl, trgterr: (
     let plist = f.params.map<CString>(fn(p) => CString::concat('(', p.pname.value, ' ', p.ptype.value, ')'));
     let pll = CString::concat('(', CString::joinAll(' ', plist), ')');
 
-    let psig = CString::concat('define-fun ', f.invokeKey.value, ' ', pll, ' ');
+	let psig = CString::concat('define-fun ', f.invokeKey.value, ' ', pll, ' ');
+
     var body: CString;
     if(f.specialname === 'cstring_empty') {
         body = '(= s "")';
@@ -1295,12 +1296,15 @@ function emitBuiltinFunctionDecl(f: SMTAssembly::BuiltinFunctionDecl, trgterr: (
     elif(f.specialname === 's_blockingfailure') {
         body = emitResultErrOtherAs(f.resultType.rtype);
     }
+	elif(f.specialname === 'mock'){
+		body = CString::concat('mock',SMTNameManager::generateResultName(f.resultType));
+	}
     else {
         _debug f.specialname;
         abort; %%Missing builtin function implementation
     }
 
-    return CString::concat('(', psig, SMTNameManager::generateResultName(f.resultType), ' ', body, ')');
+	return CString::concat('(', psig, SMTNameManager::generateResultName(f.resultType), ' ', body, ')');
 }
 
 function emitFunctionDecl(f: SMTAssembly::FunctionDecl, trgterr: (|Option<SMTAssembly::InvokeKey>, Nat|)): CString {

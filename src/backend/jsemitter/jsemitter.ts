@@ -2282,13 +2282,6 @@ class JSEmitter {
         if(bname === "s_nat_to_cstring") {
             bop = `v.toString()`;
         }
-		else if (bname === "mock"){
-			preop = `
-			const bsqonres = runProgram("/home/karidus/work/BSQON/build/output/smtextract", "Main::getForecast", [iata]);
-			const vv = _$parseBSQON(["Main::Forecast"], bsqonres);`
-
-            bop = `vv`;
-		}
         else if(bname === "s_nat_from_cstring") {
             bop = `BigInt(str)`;
         }
@@ -2392,6 +2385,13 @@ class JSEmitter {
             preop = `var state = s; while(guard(state)) { state = op(state); } `;
             bop = `state`;
         }
+		else if (bname === "mock"){
+			preop = `
+			const bsqonres = runProgram("/home/karidus/work/BSQON/build/output/smtextract", "Main::getForecast", [iata]);
+			const vv = _$parseBSQON(["Main::Forecast"], bsqonres);`
+
+            bop = `vv`;
+		}
         else {
             assert(false, `Unknown builtin function -- ${bname}`);
         }
