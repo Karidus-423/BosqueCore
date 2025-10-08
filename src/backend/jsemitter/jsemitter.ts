@@ -707,10 +707,6 @@ class JSEmitter {
         return `${params} => ${body}`;
     }
 
-    private emitLetExpression(exp: LetExpression): string {
-        assert(false, "Not implemented -- Let");
-    }
-
     private emitLambdaInvokeExpression(exp: LambdaInvokeExpression): string {
         const argl: string[] = [];
         for(let i = 0; i < exp.arginfo.length; ++i) {
@@ -851,16 +847,6 @@ class JSEmitter {
 
             return `${EmitNameManager.generateAccssorNameForTypeFunction(this.getCurrentNamespace(), rtrgt, fdecl, exp.terms.map((tt) => this.tproc(tt)))}(${argl.join(", ")})`;
         }
-    }
-    
-    private emitLogicActionAndExpression(exp: LogicActionAndExpression): string {
-        const exps = exp.args.map((ee) => this.emitExpression(ee, true));
-        return `[${exps.join(", ")}].every((ee) => ee)`;
-    }
-    
-    private emitLogicActionOrExpression(exp: LogicActionOrExpression): string {
-        const exps = exp.args.map((ee) => this.emitExpression(ee, true));
-        return `(![${exps.join(", ")}].every((ee) => !ee))`;
     }
     
     private emitParseAsTypeExpression(exp: ParseAsTypeExpression, toplevel: boolean): string {
@@ -1461,9 +1447,6 @@ class JSEmitter {
             case ExpressionTag.ConstructorLambdaExpression: {
                 return this.emitConstructorLambdaExpression(exp as ConstructorLambdaExpression);
             }
-            case ExpressionTag.LetExpression: {
-                return this.emitLetExpression(exp as LetExpression);
-            }
             case ExpressionTag.LambdaInvokeExpression: {
                 return this.emitLambdaInvokeExpression(exp as LambdaInvokeExpression);
             }
@@ -1475,12 +1458,6 @@ class JSEmitter {
             }
             case ExpressionTag.CallTypeFunctionExpression: {
                 return this.emitCallTypeFunctionExpression(exp as CallTypeFunctionExpression);
-            }
-            case ExpressionTag.LogicActionAndExpression: {
-                return this.emitLogicActionAndExpression(exp as LogicActionAndExpression);
-            }
-            case ExpressionTag.LogicActionOrExpression: {
-                return this.emitLogicActionOrExpression(exp as LogicActionOrExpression);
             }
             case ExpressionTag.ParseAsTypeExpression: {
                 return this.emitParseAsTypeExpression(exp as ParseAsTypeExpression, toplevel);

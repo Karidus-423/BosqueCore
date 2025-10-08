@@ -219,7 +219,7 @@ PartID{SystemID::from("ABC-123")} //constructs a PartID value with the value ABC
 datatype BoolOp using {
     line: Nat
 } of
-LConst { val: Bool }
+| LConst { val: Bool }
 | NotOp { arg: BoolOp }
 | AndOp { larg: BoolOp, rarg: BoolOp }
 | OrOp { larg: BoolOp, rarg: BoolOp }
@@ -321,20 +321,6 @@ Foo::f(1i, 2i) //returns -1i
 [TODO] Operators allow multiple dynamic dispatch functions to be defined. They are currently partially implemented (see issue #13). 
 
 The declaration of an operator is a virtual or abstract definition which may have Concept or Union typed arguments. Each dispatch implementation must have only unique (non-entity and non-union) typed arguments and must be defined in the same namespace as the operator (this prevents resolution ambiguity and accidental overloading). Arguments may also use literal value dispatch on one argument in the operator. If these are used then each dispatch implementation must provide a literal value for this argument.
-
-## Logical And/Or 
-Bosque provides pure logical and/or as expressions of the form `/\(e1, ..., ek)` and `\/(e1, ..., ek)`. These evaluate all arguments *before* computing the logical result, e.g. they do not short circuit evaluation. 
-
-Examples include:
-```none
-/\(true) //error -- should not be empty or have single argument
-/\(true, 1i == 1i, 2i == 2i) //returns true
-/\(true, false) //returns false
-
-\/(true) //error -- should not be empty or have single argument
-\/(false, 1i == 1i, 2i == 3i) //returns true
-\/(false, 2i == 3i) //returns false
-```
 
 ## Tuple Index Access
 Tuples are indexed using the syntax `e.i` where `i` is a literal integer value. 
@@ -714,19 +700,19 @@ Examples of simple switch expressions include:
 let x: Int? = ...;
 
 switch (x) {
-    none => 0i
+    |none => 0i
     | 0i => 1i
     | _  => 2i
 } //Int
 
 let y: Bool = ...;
 switch (y) {
-    true    => 0n
+    | true    => 0n
     | false => 1n
 } //Nat
 
 let z: Int? = switch(x) {
-    none => 0i
+    | none => 0i
     | _  => 1i
 }; //Int?
 ```
@@ -736,13 +722,13 @@ Examples of switch expressions with binders include:
 let x: {f: Nat?, g: Int} = ...;
 
 switch (x.f) {
-    none => 0n
+    |none => 0n
     | _  => $ + 1n
 } //Int
 
 let y: Option<Nat> = ...;
 switch (y) {
-    nothing => 0n
+    | nothing => 0n
     | _  => $.value() + 1n
 } //Nat
 ```
@@ -757,13 +743,13 @@ Examples of simple match expressions include:
 let x: Int | Nat | None = ...;
 
 match (x) {
-    None  => 0i
+    | None  => 0i
     | Int => 1i
     | _   => 2i
 } //Int
 
 let z: Int? = match(x) {
-    None  => 0i
+    | None  => 0i
     | Int => 1i
 }; //Int?
 ```

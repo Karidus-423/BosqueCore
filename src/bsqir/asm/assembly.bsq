@@ -14,7 +14,7 @@ datatype ConditionDecl provides AbstractDecl using {
     field exp: Expression;
 }
 of
-PreConditionDecl {
+| PreConditionDecl {
     field issoft: Bool;
 }
 | PostConditionDecl {
@@ -83,7 +83,7 @@ datatype MethodDecl provides ExplicitInvokeDecl using {
     field ofrcvrtype: NominalTypeSignature; %%Type type that this method is defined in (as opposed to the declaration type which differs for overrides)
 }
 of
-MethodDeclStatic { }
+| MethodDeclStatic { }
 | MethodDeclAbstract {}
 | MethodDeclVirtual {}
 | MethodDeclOverride { 
@@ -147,7 +147,7 @@ concept AbstractNominalTypeDecl provides AbstractDecl {
     field allValidates: List<SaturatedInvariantInfo>;
 
     method hasValidates(): Bool {
-        return \/(!this.allInvariants.empty(), !this.allValidates.empty());
+        return !this.allInvariants.empty() || !this.allValidates.empty();
     }
 
     method hasInvariants(): Bool {
@@ -179,7 +179,7 @@ entity PrimitiveEntityTypeDecl provides InternalEntityTypeDecl {
 
 datatype ConstructableTypeDecl provides InternalEntityTypeDecl 
 of
-OkTypeDecl { field oktype: TypeSignature; field failtype: TypeSignature; }
+| OkTypeDecl { field oktype: TypeSignature; field failtype: TypeSignature; }
 | FailTypeDecl { field oktype: TypeSignature; field failtype: TypeSignature; }
 | APIRejectedTypeDecl { }
 | APIFailedTypeDecl { }
@@ -194,7 +194,7 @@ datatype CollectionTypeDecl provides InternalEntityTypeDecl using {
     field oftype: TypeSignature;
 }
 of
-ListTypeDecl {  }
+| ListTypeDecl {  }
 | CRopeTypeDecl { }
 | UnicodeRopeTypeDecl { }
 | StackTypeDecl { }
@@ -217,7 +217,7 @@ concept AbstractConceptTypeDecl provides AbstractNominalTypeDecl {
 
 datatype PrimitiveConceptTypeDecl provides AbstractConceptTypeDecl 
 of
-OptionTypeDecl { 
+| OptionTypeDecl { 
     field oftype: TypeSignature; 
     field someType: TypeSignature;
 }
@@ -583,12 +583,12 @@ entity Assembly {
 
     recursive method tryResolveExpAsLiteralExpression(exp: Expression): Option<Expression> {
         match(exp)@ {
-            AccessNamespaceConstantExpression => {
-                let cc = this.nsconsts.find(pred(nsconst) => /\(nsconst.name === $exp.name, nsconst.declaredInNS === $exp.ns));
+            | AccessNamespaceConstantExpression => {
+                let cc = this.nsconsts.find(pred(nsconst) => nsconst.name === $exp.name && nsconst.declaredInNS === $exp.ns);
                 return this.tryResolveExpAsLiteralExpression[recursive](cc.value);
             }
             | AccessStaticFieldExpression => {
-                let cc = this.typeconsts.find(pred(tconst) => /\(tconst.name === $exp.name, tconst.declaredInType.tkeystr === $exp.resolvedDeclType.tkeystr));
+                let cc = this.typeconsts.find(pred(tconst) => tconst.name === $exp.name && tconst.declaredInType.tkeystr === $exp.resolvedDeclType.tkeystr);
                 return this.tryResolveExpAsLiteralExpression[recursive](cc.value);
             }
             | AccessEnumExpression => {

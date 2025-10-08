@@ -11,9 +11,6 @@ const KW_action = "action";
 const KW__debug = "_debug";
 const KW_abort = "abort";
 const KW_assert = "assert";
-const KW_bsqon = "bsqon";
-const KW_dollarbsqon = "$bsqon";
-const KW_do = "do";
 const KW_elif = "elif";
 const KW_else = "else";
 const KW_env = "env";
@@ -40,8 +37,7 @@ const KW_true = "true";
 const KW_type = "type";
 const KW_var = "var";
 const KW_yield = "yield";
-const KW_contine = "continue";
-const KW_break = "break";
+const KW_continue = "continue";
 const KW_under = "_";
 
 const KW_debug = "debug";
@@ -68,7 +64,6 @@ const KW_namespace = "namespace";
 const KW_of = "of";
 const KW_provides = "provides";
 const KW_requires = "requires";
-const KW_in = "in";
 const KW_task = "task";
 const KW_datatype = "datatype";
 const KW_using = "using";
@@ -86,7 +81,6 @@ const KW_example = "example";
 
 //reserved
 const KW_operator = "operator";
-const KW_variant = "variant";
 
 const KeywordStrings = [
     KW_recursive_q,
@@ -95,10 +89,7 @@ const KeywordStrings = [
     KW_api,
     KW_as,
     KW_action,
-    KW_bsqon,
-    KW_dollarbsqon,
     KW__debug,
-    KW_do,
     KW_abort,
     KW_assert,
     KW_concept,
@@ -118,7 +109,6 @@ const KeywordStrings = [
     KW_function,
     KW_if,
     KW_implements,
-    KW_in,
     KW_invariant,
     KW_let,
     KW_match,
@@ -151,12 +141,10 @@ const KeywordStrings = [
     KW_datatype,
     KW_using,
     KW_validate,
-    KW_variant,
     KW_var,
     KW_when,
     KW_yield,
-    KW_contine,
-    KW_break,
+    KW_continue,
     KW_under,
     KW_event,
     KW_status,
@@ -181,6 +169,7 @@ const GeneralAttributes = [
 
 const APIDeclAttributes = [
     "export",
+    "pure",
     "deterministic",
     "idempotent",
 ];
@@ -188,7 +177,7 @@ const APIDeclAttributes = [
 const InvokeAttributes = [
     "abstract",
     "override",
-    "virtual",
+    "virtual"
 ];
 
 const AllAttributes = [
@@ -210,10 +199,7 @@ const CoreOnlyAttributes = [
 
 const TermRestrictions = [
     "keytype",
-    "numeric",
-    "revalidator",
-    "crevalidator",
-    "pathvalidator",
+    "numeric"
 ].sort((a, b) => { return (a.length !== b.length) ? (b.length - a.length) : ((a !== b) ? (a < b ? -1 : 1) : 0); });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,14 +208,12 @@ const TermRestrictions = [
 const SYM_lbrack = "[";
 const SYM_lparen = "(";
 const SYM_lbrace = "{";
-const SYM_lbrackbar = "[|";
 const SYM_lparenbar = "(|";
 const SYM_lbracebar = "{|";
 
 const SYM_rbrack = "]";
 const SYM_rparen = ")";
 const SYM_rbrace = "}";
-const SYM_rbrackbar = "|]";
 const SYM_rparenbar = "|)";
 const SYM_rbracebar = "|}";
 const SYM_langle = "<";
@@ -248,8 +232,6 @@ const SYM_dot = ".";
 const SYM_eq = "=";
 const SYM_semicolon = ";";
 const SYM_question = "?";
-const SYM_land = "/\\";
-const SYM_lor = "\\/";
 const SYM_dotdotdot = "...";
 const SYM_HOLE = "$?_";
 
@@ -274,13 +256,9 @@ const SYM_gteq = " >= ";
 const SYM_minus = " - ";
 const SYM_times = " * ";
 const SYM_div = " // ";
-const SYM_wildcard = "**";
 
-//Reserved
-const SYM_questionquestion = "??";
-
-const LeftScanParens = [SYM_lbrack, SYM_lparen, SYM_lbrace, SYM_lbrackbar, SYM_lparenbar, SYM_lbracebar, SYM_langle];
-const RightScanParens = [SYM_rbrack, SYM_rparen, SYM_rbrace, SYM_rbrackbar, SYM_rparenbar, SYM_rbracebar, SYM_rangle];
+const LeftScanParens = [SYM_lbrack, SYM_lparen, SYM_lbrace, SYM_lparenbar, SYM_lbracebar, SYM_langle];
+const RightScanParens = [SYM_rbrack, SYM_rparen, SYM_rbrace, SYM_rparenbar, SYM_rbracebar, SYM_rangle];
 
 const StandardSymbols = [
     SYM_amp,
@@ -294,15 +272,11 @@ const StandardSymbols = [
     SYM_eq,
     SYM_semicolon,
     SYM_question,
-    SYM_land,
-    SYM_lor,
     SYM_dotdotdot,
     SYM_HOLE,
-    SYM_wildcard,
-
+    
     SYM_atat,
-    SYM_hash,
-    SYM_questionquestion
+    SYM_hash
 ].sort((a, b) => { return (a.length !== b.length) ? (b.length - a.length) : ((a !== b) ? (a < b ? -1 : 1) : 0); });
 
 const SpaceRequiredSymbols = [
@@ -351,10 +325,7 @@ export {
     KW_api,
     KW_as,
     KW_action,
-    KW_bsqon,
-    KW_dollarbsqon,
     KW__debug,
-    KW_do,
     KW_abort,
     KW_assert,
     KW_concept,
@@ -374,7 +345,6 @@ export {
     KW_function,
     KW_if,
     KW_implements,
-    KW_in,
     KW_invariant,
     KW_let,
     KW_match,
@@ -407,12 +377,10 @@ export {
     KW_datatype,
     KW_using,
     KW_validate,
-    KW_variant,
     KW_var,
     KW_when,
     KW_yield,
-    KW_contine,
-    KW_break,
+    KW_continue,
     KW_under,
     KW_event,
     KW_resource,
@@ -426,14 +394,12 @@ export {
     SYM_lparen,
     SYM_lbrace,
     SYM_langle,
-    SYM_lbrackbar,
     SYM_lparenbar,
     SYM_lbracebar,
     SYM_rbrack,
     SYM_rparen,
     SYM_rbrace,
     SYM_rangle,
-    SYM_rbrackbar,
     SYM_rparenbar,
     SYM_rbracebar,
 
@@ -450,12 +416,9 @@ export {
     SYM_eq,
     SYM_semicolon,
     SYM_question,
-    SYM_land,
-    SYM_lor,
     SYM_dotdotdot,
     SYM_HOLE,
-    SYM_wildcard,
-
+    
     SYM_positive,
     SYM_negate,
 

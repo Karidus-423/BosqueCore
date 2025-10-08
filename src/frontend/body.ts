@@ -210,8 +210,6 @@ enum ExpressionTag {
     ConstructorEListExpression = "ConstructorEListExpression",
     ConstructorLambdaExpression = "ConstructorLambdaExpression",
 
-    LetExpression = "LetExpression",
-
     LambdaInvokeExpression = "LambdaInvokeExpression",
     SpecialConstructorExpression = "SpecialConstructorExpression",
     SpecialConverterExpression = "SpecialConverterExpression",
@@ -221,9 +219,6 @@ enum ExpressionTag {
     CallRefThisExpression = "CallRefThisExpression",
     CallRefSelfExpression = "CallRefSelfExpression",
     CallTaskActionExpression = "CallTaskActionExpression",
-    
-    LogicActionAndExpression = "LogicActionAndExpression",
-    LogicActionOrExpression = "LogicActionOrExpression",
 
     ParseAsTypeExpression = "ParseAsTypeExpression",
     SafeConvertExpression = "SafeConvertExpression",
@@ -545,22 +540,6 @@ class ConstructorLambdaExpression extends Expression {
     }
 }
 
-class LetExpression extends Expression {
-    readonly decls: {vname: string, vtype: TypeSignature | undefined, value: Expression}[];
-    readonly body: Expression;
-
-    constructor(sinfo: SourceInfo, decls: {vname: string, vtype: TypeSignature | undefined, value: Expression}[], body: Expression) {
-        super(ExpressionTag.LetExpression, sinfo);
-        this.decls = decls;
-        this.body = body;
-    }
-
-    emit(toplevel: boolean, fmt: CodeFormatter): string {
-        const dds = this.decls.map((dd) => `${dd.vname}${dd.vtype !== undefined ? ":" + dd.vtype.emit() : ""} = ${dd.value.emit(true, fmt)},`).join(", ");
-        return `(let ${dds} in ${this.body.emit(true, fmt)})`;
-    }
-}
-
 class SpecialConstructorExpression extends Expression {
     readonly rop: "ok" | "fail" | "some";
     readonly arg: Expression;
@@ -771,32 +750,6 @@ class CallTaskActionExpression extends Expression {
         }
 
         return `do self.${this.name}${terms}${this.args.emit(fmt, "(", ")")}`;
-    }
-}
-
-class LogicActionAndExpression extends Expression {
-    readonly args: Expression[];
-
-    constructor(sinfo: SourceInfo, args: Expression[]) {
-        super(ExpressionTag.LogicActionAndExpression, sinfo);
-        this.args = args;
-    }
-
-    emit(toplevel: boolean, fmt: CodeFormatter): string {
-        return `/\\(${this.args.map((arg) => arg.emit(toplevel, fmt)).join(", ")})`;
-    }
-}
-
-class LogicActionOrExpression extends Expression {
-    readonly args: Expression[];
-
-    constructor(sinfo: SourceInfo, args: Expression[]) {
-        super(ExpressionTag.LogicActionOrExpression, sinfo);
-        this.args = args;
-    }
-
-    emit(toplevel: boolean, fmt: CodeFormatter): string {
-        return `\\/(${this.args.map((arg) => arg.emit(toplevel, fmt)).join(", ")})`;
     }
 }
 
@@ -2004,10 +1957,8 @@ class SwitchStatement extends Statement {
         const ttmf = this.switchflow.map((sf) => `${sf.lval ? sf.lval.exp.emit(true, fmt) : "_"} => ${sf.value.emit(fmt)}`);
         fmt.indentPop();
 
-        const iil = fmt.indent(ttmf[0]);
-        const iir = ttmf.slice(1).map((cc) => fmt.indent("| " + cc));
-
-        return `${mheader} {\n${[iil, ...iir].join("\n")}\n${fmt.indent("}")}`;
+        const iir = ttmf.map((cc) => fmt.indent("| " + cc));
+        return `${mheader} {\n${iir.join("\n")}\n${fmt.indent("}")}`;
     }
 }
 
@@ -2035,10 +1986,8 @@ class MatchStatement extends Statement {
         const ttmf = this.matchflow.map((mf) => `${mf.mtype ? mf.mtype.emit() : "_"} => ${mf.value.emit(fmt)}`);
         fmt.indentPop();
 
-        const iil = fmt.indent(ttmf[0]);
-        const iir = ttmf.slice(1).map((cc) => fmt.indent("| " + cc));
-
-        return `${mheader} {\n${[iil, ...iir].join("\n")}\n${fmt.indent("}")}`;
+        const iir = ttmf.map((cc) => fmt.indent("| " + cc));
+        return `${mheader} {\n${iir.join("\n")}\n${fmt.indent("}")}`;
     }
 }
 
@@ -2403,13 +2352,11 @@ export {
     AccessNamespaceConstantExpression, AccessStaticFieldExpression, AccessEnumExpression, AccessVariableExpression,
     ConstructorExpression, ConstructorPrimaryExpression, ConstructorEListExpression,
     ConstructorLambdaExpression, SpecialConstructorExpression, SpecialConverterExpression,
-    LetExpression,
     LambdaInvokeExpression,
     CallNamespaceFunctionExpression, CallTypeFunctionExpression, 
     CallRefInvokeExpression, CallRefVariableExpression, CallRefThisExpression, CallRefSelfExpression, 
     CallTaskActionExpression,
-    LogicActionAndExpression, LogicActionOrExpression,
-    ParseAsTypeExpression, SafeConvertExpression, CreateDirectExpression, 
+    ParseAsTypeExpression, SafeConvertExpression, CreateDirectExpression,
     PostfixOpTag, PostfixOperation, PostfixOp,
     PostfixError, PostfixAccessFromName, PostfixAccessFromIndex, PostfixProjectFromNames,
     PostfixIsTest, PostfixAsConvert,
