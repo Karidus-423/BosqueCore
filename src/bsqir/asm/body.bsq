@@ -282,6 +282,12 @@ entity CreateDirectExpression provides Expression {
     field trgttype: NominalTypeSignature;
 }
 
+entity SqlConnectExpression provides Expression{
+	field exp: Expression;
+	field srctype: NominalTypeSignature;
+	field trgttype: NominalTypeSignature;
+}
+
 datatype PostfixOperation using {
     field sinfo: SourceInfo;
     field baseType: TypeSignature;

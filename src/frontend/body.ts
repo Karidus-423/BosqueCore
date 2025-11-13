@@ -224,6 +224,7 @@ enum ExpressionTag {
     ParseAsTypeExpression = "ParseAsTypeExpression",
     SafeConvertExpression = "SafeConvertExpression",
     CreateDirectExpression = "CreateDirectExpression",
+	SqlConnectExpression = "SqlConnectExpression",
 
     PostfixOpExpression = "PostfixOpExpression",
 
@@ -800,6 +801,32 @@ class CreateDirectExpression extends Expression {
 
     emit(toplevel: boolean, fmt: CodeFormatter): string {
         return `s_createDirect<${this.srctype.emit()}, ${this.trgttype.emit()}>(${this.exp.emit(toplevel, fmt)})`;
+    }
+}
+
+class SqlConnectExpression extends Expression{
+	readonly name: string;
+	readonly args: ArgumentList;
+    readonly exp: Expression;
+    readonly srctype: TypeSignature;
+    readonly trgttype: TypeSignature;
+
+    constructor(sinfo: SourceInfo, args: ArgumentList, name: string, exp: Expression, srctype: TypeSignature, trgttype: TypeSignature) {
+        super(ExpressionTag.SqlConnectExpression, sinfo);
+		this.args = args;
+		this.name = name;
+		this.exp = exp;
+		this.srctype = srctype;
+		this.trgttype = trgttype;
+    }
+
+    emit(toplevel: boolean): string {
+		return `const ${this.name} = await mysql.createConnection({
+			host: "${this.args.args.at(0)}",
+			user: "${this.args.args.at(1)}",
+			password: "${this.args.args.at(2)}",
+		});`
+
     }
 }
 
@@ -2357,7 +2384,7 @@ export {
     CallNamespaceFunctionExpression, CallTypeFunctionExpression, 
     CallRefInvokeExpression, CallRefVariableExpression, CallRefThisExpression, CallRefSelfExpression, 
     CallTaskActionExpression,
-    ParseAsTypeExpression, SafeConvertExpression, CreateDirectExpression,
+    ParseAsTypeExpression, SafeConvertExpression, CreateDirectExpression, SqlConnectExpression,
     PostfixOpTag, PostfixOperation, PostfixOp,
     PostfixError, PostfixAccessFromName, PostfixAccessFromIndex, PostfixProjectFromNames,
     PostfixIsTest, PostfixAsConvert,

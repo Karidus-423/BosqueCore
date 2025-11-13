@@ -356,6 +356,11 @@ entity ConstantSimplification {
         return e[exp=nexp];
     }
 
+    recursive method processSqlConnectExpression(e: SqlConnectExpression): Expression {
+        let nexp = this.processUnaryArg[recursive](e.exp);
+        return e[exp=nexp];
+    }
+
     recursive method processPostfixAssignFields(op: PostfixAssignFields): PostfixAssignFields {
         let nupdates = op.updates.map<(|NominalTypeSignature, Identifier, NominalTypeSignature, Expression|)>(
             fn(upd) => {
@@ -796,6 +801,7 @@ entity ConstantSimplification {
             | CoerceWidenTypeExpression => { return this.processCoerceWidenTypeExpression[recursive]($e); }
             | SafeConvertExpression => { return this.processSafeConvertExpression[recursive]($e); }
             | CreateDirectExpression => { return this.processCreateDirectExpression[recursive]($e); }
+			| SqlConnectExpression => {return this.processSqlConnectExpression[recursive]($e); }
             | PostfixOp => { return this.processPostfixOp[recursive]($e); }
             | UnaryExpression => { return this.processUnaryExpression[recursive]($e); }
             | BinaryArithExpression => { return this.processBinaryArithExpression[recursive]($e); }

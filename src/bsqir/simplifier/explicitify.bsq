@@ -377,6 +377,13 @@ entity ExplicitifyTransform {
         return e[exp=cexp];
     }
 
+	recursive method processSqlConnectExpression(e: SqlConnectExpression, vmap: VarMapping): Expression{
+        let nexp = this.processUnaryArg[recursive](e.exp, vmap);
+        let cexp = this.processCoerceTypeAsNeeded(nexp, e.srctype);
+
+        return e[exp=cexp];
+	}
+
     recursive method processPostfixAssignFields(op: PostfixAssignFields, vmap: VarMapping): PostfixAssignFields {
         let nupdates = op.updates.map<(|NominalTypeSignature, Identifier, NominalTypeSignature, Expression|)>(
             fn(upd) => {
@@ -650,6 +657,7 @@ entity ExplicitifyTransform {
             | CoerceWidenTypeExpression => { return this.processCoerceWidenTypeExpression[recursive]($e, vmap); }
             | SafeConvertExpression => { return this.processSafeConvertExpression[recursive]($e, vmap); }
             | CreateDirectExpression => { return this.processCreateDirectExpression[recursive]($e, vmap); }
+			| SqlConnectExpression => {return this.processSqlConnectExpression[recursive]($e,vmap);}
             | PostfixOp => { return this.processPostfixOp[recursive]($e, vmap); }
             | UnaryExpression => { return this.processUnaryExpression[recursive]($e, vmap); }
             | BinaryArithExpression => { return this.processBinaryArithExpression[recursive]($e, vmap); }

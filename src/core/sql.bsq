@@ -1,0 +1,14 @@
+namespace Core;
+
+
+namespace SQL{
+	entity SQLConnection{
+		%%Find Database
+			%%Create Database
+	}
+
+	%%On await rejection return None.
+	function createConnection(host : String, user : String, password: String): SQLConnection{
+		return XCore::s_sqlConnection<String,SQLConnection>(host,user,password);
+	}
+}
