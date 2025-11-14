@@ -9,16 +9,23 @@ namespace SQL{
 		field host: String;
 		field user: String;
 
-		function locateDB(db:String, connection: Connection_): SQLDatabase = sql_locateDB;
+		method checkDB(db:String, connection: Connection_): Bool = sql_checkDB;
 
 		method createDatabase(db: String){
-			%%Create the Database in SQL
-			%%Create the SQLDatabase object and reuturn it.
+			%%Create the Database in SQL.
+			%%On Success return the SQLDatabase entity, giving an empty tables field.
+			%%This can fail. On Failure return error.
 			;
 		}
 		method findDatabase(db : String){
+			%%Returns if database has been found.
+			var found_db = this.checkDB(db, this.process);
+			%%TODO
+			%%If true, scan the tables of the database and return SQLDatabase entity.
+			%%If false, return create the Database and return the SQLDatabase entity.
 			%%function equal(cb1: CCharBuffer, cb2: CCharBuffer): Bool = ccharbuffer_equal;
 			%%Use the database. Create it if not found.
+			%%This can fail. On failure return error.
 			;
 		}
 	}
@@ -41,7 +48,7 @@ namespace SQL{
 	}
 
 	%%On await rejection return None.
-	function createConnection(host : String, user : String, password: String): SQLConnection{
+	async function createConnection(host : String, user : String, password: String): SQLConnection{
 		%%1. Pass all arguments to mysql2.createConnection.
 		let conn_id = XCore::s_sqlConnection<String,Connection_>(host,user,password);
 		let connection = SQLConnection{conn_id,host,user};

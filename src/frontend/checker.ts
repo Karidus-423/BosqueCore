@@ -1584,7 +1584,7 @@ class TypeChecker {
             return exp.setType(new ErrorTypeSignature(exp.sinfo, undefined));
         }
         else {
-            const ltype = new LambdaTypeSignature(exp.sinfo, exp.invoke.recursive, exp.invoke.name as "fn" | "pred", params, rtype);
+            const ltype = new LambdaTypeSignature(exp.sinfo, exp.invoke.recursive, exp.invoke.async, exp.invoke.name as "fn" | "pred", params, rtype);
 
             const ireturn = this.relations.convertTypeSignatureToTypeInferCtx(rtype);
             const lenv = TypeEnvironment.createInitialLambdaEnv(args, rtype, ireturn, env);

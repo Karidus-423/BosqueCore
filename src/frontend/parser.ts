@@ -6,7 +6,7 @@ import { AutoTypeSignature, EListTypeSignature, ErrorTypeSignature, FullyQualifi
 import { AbortStatement, AbstractBodyImplementation, AccessEnumExpression, AccessNamespaceConstantExpression, AccessVariableExpression, ArgumentList, ArgumentValue, AssertStatement, BinAddExpression, BinDivExpression, BinKeyEqExpression, BinKeyNeqExpression, BinLogicAndExpression, BinLogicIFFExpression, BinLogicImpliesExpression, BinLogicOrExpression, BinMultExpression, BinSubExpression, BinderInfo, BlockStatement, BodyImplementation, BuiltinBodyImplementation, CallNamespaceFunctionExpression, ConstantExpressionValue, ConstructorEListExpression, ConstructorLambdaExpression, DebugStatement, EmptyStatement, ErrorExpression, ErrorStatement, Expression, ExpressionBodyImplementation, ExpressionTag, ITest, ITestFail, ITestNone, ITestOk, ITestSome, ITestType, IfElifElseStatement, IfElseStatement, IfExpression, IfStatement, IfTest, LiteralExpressionValue, LiteralRegexExpression, LiteralSimpleExpression, LiteralNoneExpression, LiteralTypeDeclValueExpression, MapEntryConstructorExpression, MatchStatement, NamedArgumentValue, NumericEqExpression, NumericGreaterEqExpression, NumericGreaterExpression, NumericLessEqExpression, NumericLessExpression, NumericNeqExpression, ParseAsTypeExpression, PositionalArgumentValue, PostfixAsConvert, PostfixIsTest, PostfixOp, PostfixOperation, PredicateUFBodyImplementation, PrefixNegateOrPlusOpExpression, PrefixNotOpExpression, RefArgumentValue, SpreadArgumentValue, StandardBodyImplementation, Statement, SwitchStatement, SynthesisBodyImplementation, ValidateStatement, VariableAssignmentStatement, VariableDeclarationStatement, VariableInitializationStatement, VariableMultiAssignmentStatement, VariableMultiDeclarationStatement, VariableMultiInitializationStatement, VariableRetypeStatement, SpecialConstructorExpression, ConstructorPrimaryExpression, PostfixAccessFromName, ReturnVoidStatement, ReturnSingleStatement, PostfixInvoke, KeyCompareEqExpression, KeyCompareLessExpression, ReturnMultiStatement, SafeConvertExpression, PostfixAccessFromIndex, AccessStaticFieldExpression, CallTypeFunctionExpression, CreateDirectExpression, SqlConnectExpression, LambdaInvokeExpression, ThisUpdateStatement, VarUpdateStatement, CallRefThisExpression, VoidRefCallStatement, CallRefSelfExpression, CallRefVariableExpression, CallRefInvokeExpression, PostfixAssignFields } from "./body.js";
 import { APIDecl, APIResultTypeDecl, AbstractNominalTypeDecl, AdditionalTypeDeclTag, Assembly, ConceptTypeDecl, ConstMemberDecl, CRopeTypeDecl, CRopeIteratorTypeDecl, UnicodeRopeTypeDecl, UnicodeRopeIteratorTypeDecl, DatatypeMemberEntityTypeDecl, DatatypeTypeDecl, DeclarationAttibute, EntityTypeDecl, EnumTypeDecl, EnvironmentVariableInformation, EventListTypeDecl, FunctionInvokeDecl, InternalConceptTypeDecl, InvariantDecl, InvokeTemplateTermDecl, InvokeTemplateTypeRestriction, InvokeTemplateTypeRestrictionClause, LambdaDecl, ListTypeDecl, MapEntryTypeDecl, MapTypeDecl, MemberFieldDecl, MethodDecl, NamespaceDeclaration, NamespaceFunctionDecl, NamespaceUsing, PostConditionDecl, PreConditionDecl, PrimitiveEntityTypeDecl, QueueTypeDecl, ResourceAccessModes, ResourceInformation, ResultTypeDecl, SetTypeDecl, StackTypeDecl, TaskActionDecl, TaskDecl, TaskMethodDecl, TypeFunctionDecl, TypeTemplateTermDecl, TypedeclTypeDecl, ValidateDecl, WELL_KNOWN_EVENTS_VAR_NAME, WELL_KNOWN_RETURN_VAR_NAME, SomeTypeDecl, OptionTypeDecl, TemplateTermDeclExtraTag, InvokeParameterDecl, OkTypeDecl, FailTypeDecl, APIRejectedTypeDecl, APIFailedTypeDecl, APIErrorTypeDecl, APISuccessTypeDecl, InternalEntityTypeDecl, AbstractCollectionTypeDecl, TestAssociation } from "./assembly.js";
 import { BuildLevel, CodeFileInfo, CodeFormatter, SourceInfo } from "./build_decls.js";
-import { AllAttributes, CoreOnlyAttributes, KW__debug, KW_abort, KW_action, KW_api, KW_as, KW_assert, KW_chktest, KW_concept, KW_const, KW_datatype, KW_debug, KW_declare, KW_elif, KW_else, KW_ensures, KW_entity, KW_enum, KW_env, KW_fail, KW_errtest, KW_event, KW_example, KW_false, KW_field, KW_fn, KW_function, KW_if, KW_implements, KW_invariant, KW_let, KW_match, KW_method, KW_namespace, KW_none, KW_of, KW_ok, KW_pred, KW_predicate, KW_provides, KW_recursive, KW_recursive_q, KW_ref, KW_release, KW_requires, KW_resource, KW_return, KW_safety, KW_self, KW_softcheck, KW_some, KW_spec, KW_status, KW_switch, KW_task, KW_test, KW_then, KW_this, KW_true, KW_type, KW_under, KW_using, KW_validate, KW_var, KW_when, KeywordStrings, LeftScanParens, ParenSymbols, RightScanParens, SYM_HOLE, SYM_amp, SYM_ampamp, SYM_arrow, SYM_at, SYM_atat, SYM_bang, SYM_bangeq, SYM_bangeqeq, SYM_bar, SYM_barbar, SYM_bigarrow, SYM_colon, SYM_coloncolon, SYM_coma, SYM_div, SYM_dot, SYM_dotdotdot, SYM_eq, SYM_eqeq, SYM_eqeqeq, SYM_gt, SYM_gteq, SYM_hash, SYM_iff, SYM_implies, SYM_langle, SYM_lbrace, SYM_lbrack, SYM_lparen, SYM_lparenbar, SYM_lt, SYM_lteq, SYM_minus, SYM_negate, SYM_plus, SYM_positive, SYM_question, SYM_rangle, SYM_rbrace, SYM_rbrack, SYM_rparen, SYM_rparenbar, SYM_semicolon, SYM_times, SpaceFrontSymbols, SpaceRequiredSymbols, StandardSymbols, TermRestrictions } from "./parser_kw.js";
+import { AllAttributes, CoreOnlyAttributes, KW__debug, KW_abort, KW_action, KW_api, KW_as, KW_assert, KW_chktest, KW_concept, KW_const, KW_datatype, KW_debug, KW_declare, KW_elif, KW_else, KW_ensures, KW_entity, KW_enum, KW_env, KW_fail, KW_errtest, KW_event, KW_example, KW_false, KW_field, KW_fn, KW_function, KW_if, KW_implements, KW_invariant, KW_let, KW_match, KW_method, KW_namespace, KW_none, KW_of, KW_ok, KW_pred, KW_predicate, KW_provides, KW_recursive, KW_recursive_q, KW_async, KW_ref, KW_release, KW_requires, KW_resource, KW_return, KW_safety, KW_self, KW_softcheck, KW_some, KW_spec, KW_status, KW_switch, KW_task, KW_test, KW_then, KW_this, KW_true, KW_type, KW_under, KW_using, KW_validate, KW_var, KW_when, KeywordStrings, LeftScanParens, ParenSymbols, RightScanParens, SYM_HOLE, SYM_amp, SYM_ampamp, SYM_arrow, SYM_at, SYM_atat, SYM_bang, SYM_bangeq, SYM_bangeqeq, SYM_bar, SYM_barbar, SYM_bigarrow, SYM_colon, SYM_coloncolon, SYM_coma, SYM_div, SYM_dot, SYM_dotdotdot, SYM_eq, SYM_eqeq, SYM_eqeqeq, SYM_gt, SYM_gteq, SYM_hash, SYM_iff, SYM_implies, SYM_langle, SYM_lbrace, SYM_lbrack, SYM_lparen, SYM_lparenbar, SYM_lt, SYM_lteq, SYM_minus, SYM_negate, SYM_plus, SYM_positive, SYM_question, SYM_rangle, SYM_rbrace, SYM_rbrack, SYM_rparen, SYM_rparenbar, SYM_semicolon, SYM_times, SpaceFrontSymbols, SpaceRequiredSymbols, StandardSymbols, TermRestrictions } from "./parser_kw.js";
 
 type ParsePhase = number;
 const ParsePhase_RegisterNames: ParsePhase = 1;
@@ -2156,6 +2156,12 @@ class Parser {
             this.consumeToken();
         }
 
+        let isasync: "yes" | "no" = "no";
+        if(this.testToken(KW_async)) {
+            isrecursive = this.testToken(KW_recursive) ? "yes" : "no";
+            this.consumeToken();
+        }
+
         let ispred = false;
         let isfn = false;
         while(this.testToken(KW_pred) || this.testToken(KW_fn)) {
@@ -2201,7 +2207,7 @@ class Parser {
         const body = this.parseBody([], false, true);
         this.env.popLambdaScope();
 
-        return new LambdaDecl(this.env.currentFile, cinfo, [], ispred ? "pred" : "fn", isrecursive, params, resultInfo, body, !someTypedParams);
+        return new LambdaDecl(this.env.currentFile, cinfo, [], ispred ? "pred" : "fn", isrecursive, isasync, params, resultInfo, body, !someTypedParams);
     }
 
     private parseFunctionInvokeDecl(functionkind: "namespace" | "predicate" | "errtest" | "chktest" | "example" | "typescope", attributes: DeclarationAttibute[], typeTerms: Set<string>): FunctionInvokeDecl | undefined {
@@ -2210,6 +2216,12 @@ class Parser {
         let isrecursive: "yes" | "no" | "cond" = "no";
         if(this.testToken(KW_recursive) || this.testToken(KW_recursive_q)) {
             isrecursive = this.testToken(KW_recursive) ? "yes" : "cond";
+            this.consumeToken();
+        }
+
+        let isasync: "yes" | "no" = "no";
+        if(this.testToken(KW_async)) {
+            isrecursive = this.testToken(KW_async) ? "yes" : "no";
             this.consumeToken();
         }
 
@@ -2268,10 +2280,10 @@ class Parser {
         this.env.popStandardFunctionScope();
 
         if(functionkind === "typescope") {
-            return new TypeFunctionDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, params, resultInfo, body, terms, termRestrictions, preconds, postconds);
+            return new TypeFunctionDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, isasync, params, resultInfo, body, terms, termRestrictions, preconds, postconds);
         }
         else {
-            return new NamespaceFunctionDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, params, resultInfo, body, terms, termRestrictions, preconds, postconds, tassoc, fkind);
+            return new NamespaceFunctionDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, isasync, params, resultInfo, body, terms, termRestrictions, preconds, postconds, tassoc, fkind);
         }
     }
 
@@ -2281,6 +2293,12 @@ class Parser {
         let isrecursive: "yes" | "no" | "cond" = "no";
         if(this.testToken(KW_recursive) || this.testToken(KW_recursive_q)) {
             isrecursive = this.testToken(KW_recursive) ? "yes" : "cond";
+            this.consumeToken();
+        }
+
+        let isasync: "yes" | "no" = "no";
+        if(this.testToken(KW_async)) {
+            isrecursive = this.testToken(KW_recursive) ? "yes" : "no";
             this.consumeToken();
         }
 
@@ -2334,10 +2352,10 @@ class Parser {
         this.env.popStandardFunctionScope();
 
         if(taskscope) {
-            return new TaskMethodDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, params, resultInfo, body, terms, termRestrictions, preconds, postconds, isref);
+            return new TaskMethodDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, isasync, params, resultInfo, body, terms, termRestrictions, preconds, postconds, isref);
         }
         else {
-            return new MethodDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, params, resultInfo, body, terms, termRestrictions, preconds, postconds, isref);
+            return new MethodDecl(this.env.currentFile, cinfo, attributes, fname, isrecursive, isasync, params, resultInfo, body, terms, termRestrictions, preconds, postconds, isref);
         }
     }
 
@@ -2446,6 +2464,7 @@ class Parser {
             case KW_fn:
             case KW_pred:
             case KW_recursive_q:
+			case KW_async:
             case KW_recursive: {
                 return this.parseLambdaType();
             }
@@ -2567,6 +2586,13 @@ class Parser {
             this.consumeToken();
         }
 
+        let isasync: "yes" | "no" = "no";
+        if(this.testToken(KW_async)) {
+            isasync = this.testToken(KW_async) ? "yes" : "no";
+            this.consumeToken();
+        }
+
+
         let name: "fn" | "pred" = "fn";
         if(this.testToken(KW_fn) || this.testToken(KW_pred)) {
             name = this.consumeTokenAndGetValue() as "fn" | "pred";
@@ -2584,7 +2610,7 @@ class Parser {
         this.ensureAndConsumeTokenAlways(SYM_arrow, "lambda type reference");
         const resultInfo = this.parseReturnTypeSignature(true);
 
-        return new LambdaTypeSignature(sinfo, isrecursive, name, params, resultInfo);
+        return new LambdaTypeSignature(sinfo, isrecursive, isasync, name, params, resultInfo);
     }
 
     private parseElistType(): TypeSignature {
@@ -2705,6 +2731,26 @@ class Parser {
         }
              
         return recursive;
+    }
+
+    private parseInvokeAsyncArgs(): "yes" | "no" {
+        let async: "yes" | "no" = "no";
+         
+        if(this.testToken(SYM_lbrack)) {
+            this.consumeToken();
+            if (!this.testToken(KW_async)) {
+                this.recordErrorGeneral(this.peekToken(), "Expected async annotation");
+            }
+    
+            async = this.testToken("async") ? "yes" : "no";
+            if(!this.testToken(SYM_rbrack)) {
+                this.consumeToken();
+            }
+    
+            this.ensureAndConsumeTokenIf(SYM_rbrack, "async annotation");
+        }
+             
+        return async;
     }
 
     private checkArgs(args: ArgumentValue[]) {
@@ -3104,6 +3150,7 @@ class Parser {
             //We can always safely parse these as they are optional but check below to make sure they are valid
             const hasrec = this.testToken(SYM_lbrack);
             const isrecursive = this.parseInvokeRecursiveArgs();
+			const isasync = this.parseInvokeAsyncArgs();
 
             const hastargs = this.testToken(SYM_langle);
             const targs = this.parseInvokeTemplateArguments();
@@ -3111,7 +3158,7 @@ class Parser {
             if(this.testToken(SYM_lparen)) {
                 const args = this.parseArgumentsCallStd(true);
 
-                return new CallTypeFunctionExpression(sinfo, tsig, idname, targs, isrecursive, args);
+                return new CallTypeFunctionExpression(sinfo, tsig, idname, targs, isrecursive, isasync, args);
             }
             else {
                 if(hasrec || hastargs) {
@@ -4835,7 +4882,7 @@ class Parser {
             if (this.testToken(KW_const)) {
                 this.parseNamespaceConstant(attributes);
             }
-            else if(this.testFollows(KW_function) || this.testFollows(KW_recursive, KW_function) || this.testFollows(KW_recursive_q, KW_function)) {
+            else if(this.testFollows(KW_function) || this.testFollows(KW_recursive, KW_function) || this.testFollows(KW_recursive_q, KW_function) || this.testFollows(KW_async, KW_function)) {
                 this.parseNamespaceFunction(attributes);
             }
             else if(this.testFollows(KW_predicate)) {
@@ -4869,7 +4916,7 @@ class Parser {
                 this.parseSubNamespace();
             }
             else {
-                this.recordErrorGeneral(sinfo, `Unknown member ${this.peekTokenData()}`);
+                this.recordErrorGeneral(sinfo, `Unknown namespace member ${this.peekTokenData()}`);
 
                 this.currentState().skipToPosition(rpos);
             }
@@ -4955,6 +5002,7 @@ class Parser {
         if(isParsePhase_Enabled(this.currentPhase, ParsePhase_RegisterNames)) {
             this.consumeTokenIf(KW_recursive);
             this.consumeTokenIf(KW_recursive_q);
+			this.consumeTokenIf(KW_async);
             this.consumeToken();
 
             const fname = this.consumeTokenAndGetValue();
@@ -5254,10 +5302,10 @@ class Parser {
 
                 this.parseInvariantsInto(invariants, validates, typeTerms);
             }
-            else if (this.testToken(KW_function) || this.testFollows(KW_recursive, KW_function) || this.testFollows(KW_recursive_q, KW_function)) {
+            else if (this.testToken(KW_function) || this.testFollows(KW_recursive, KW_function) || this.testFollows(KW_recursive_q, KW_function) || this.testFollows(KW_async, KW_function)) {
                 this.parseMemberFunction(functionMembers, allMemberNames, attributes, typeTerms);
             }
-            else if(this.testToken(KW_ref) || this.testFollows(KW_recursive, KW_ref) || this.testFollows(KW_recursive_q, KW_ref)) {
+            else if(this.testToken(KW_ref) || this.testFollows(KW_recursive, KW_ref) || this.testFollows(KW_recursive_q, KW_ref) || this.testFollows(KW_async, KW_ref)) {
                 if(istask) {
                     this.parseTaskMemberMethod(taskMemberMethods, allMemberNames, attributes, typeTerms);
                 }
@@ -5265,7 +5313,7 @@ class Parser {
                     this.parseMemberMethod(memberMethods, allMemberNames, attributes, typeTerms);
                 }
             }
-            else if(this.testToken(KW_method) || this.testFollows(KW_recursive, KW_method) || this.testFollows(KW_recursive_q, KW_method)) {
+            else if(this.testToken(KW_method) || this.testFollows(KW_recursive, KW_method) || this.testFollows(KW_recursive_q, KW_method) || this.testFollows(KW_async, KW_method)) {
                 if(istask) {
                     this.parseTaskMemberMethod(taskMemberMethods, allMemberNames, attributes, typeTerms);
                 }
@@ -5290,7 +5338,7 @@ class Parser {
                 }
             }
             else {
-                this.recordErrorGeneral(sinfo, `Unknown member ${this.peekTokenData()}`);
+                this.recordErrorGeneral(sinfo, `Unknown OOP member ${this.peekTokenData()}`);
                 this.currentState().moveToRecoverPosition();
                 this.popStateIntoParentOk();
                 return;

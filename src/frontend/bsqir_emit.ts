@@ -3,7 +3,7 @@ import assert from "node:assert";
 import { AbstractCollectionTypeDecl, AbstractConceptTypeDecl, AbstractCoreDecl, AbstractDecl, AbstractEntityTypeDecl, AbstractInvokeDecl, AbstractNominalTypeDecl, APIErrorTypeDecl, APIFailedTypeDecl, APIRejectedTypeDecl, APIResultTypeDecl, APISuccessTypeDecl, Assembly, ConceptTypeDecl, ConditionDecl, ConstMemberDecl, ConstructableTypeDecl, CRopeIteratorTypeDecl, CRopeTypeDecl, DatatypeMemberEntityTypeDecl, DatatypeTypeDecl, DeclarationAttibute, EntityTypeDecl, EnumTypeDecl, EventListTypeDecl, ExplicitInvokeDecl, FailTypeDecl, FunctionInvokeDecl, InternalEntityTypeDecl, InvariantDecl, InvokeParameterDecl, ListTypeDecl, MapEntryTypeDecl, MapTypeDecl, MemberFieldDecl, MethodDecl, NamespaceConstDecl, NamespaceDeclaration, NamespaceFunctionDecl, OkTypeDecl, OptionTypeDecl, PostConditionDecl, PreConditionDecl, PrimitiveEntityTypeDecl, QueueTypeDecl, ResultTypeDecl, SetTypeDecl, SomeTypeDecl, StackTypeDecl, TestAssociation, TypedeclTypeDecl, UnicodeRopeTypeDecl, UnicodeRopeIteratorTypeDecl, ValidateDecl } from "./assembly.js";
 import { FunctionInstantiationInfo, MethodInstantiationInfo, NamespaceInstantiationInfo, TypeInstantiationInfo } from "./instantiation_map.js";
 import { SourceInfo } from "./build_decls.js";
-import { EListTypeSignature, FullyQualifiedNamespace, LambdaParameterSignature, LambdaTypeSignature, NominalTypeSignature, RecursiveAnnotation, TemplateNameMapper, TemplateTypeSignature, TypeSignature, VoidTypeSignature } from "./type.js";
+import { AsyncAnnotation, EListTypeSignature, FullyQualifiedNamespace, LambdaParameterSignature, LambdaTypeSignature, NominalTypeSignature, RecursiveAnnotation, TemplateNameMapper, TemplateTypeSignature, TypeSignature, VoidTypeSignature } from "./type.js";
 import { AbortStatement, AbstractBodyImplementation, AccessEnumExpression, AccessNamespaceConstantExpression, AccessStaticFieldExpression, AccessVariableExpression, ArgumentValue, AssertStatement, BinAddExpression, BinderInfo, BinDivExpression, BinKeyEqExpression, BinKeyNeqExpression, BinLogicAndExpression, BinLogicIFFExpression, BinLogicImpliesExpression, BinLogicOrExpression, BinMultExpression, BinSubExpression, BlockStatement, BodyImplementation, BuiltinBodyImplementation, CallNamespaceFunctionExpression, CallRefSelfExpression, CallRefThisExpression, CallRefVariableExpression, CallTaskActionExpression, CallTypeFunctionExpression, ConstructorEListExpression, ConstructorExpression, ConstructorLambdaExpression, ConstructorPrimaryExpression, CreateDirectExpression, DebugStatement, EmptyStatement, Expression, ExpressionBodyImplementation, ExpressionTag, IfElifElseStatement, IfElseStatement, IfExpression, IfStatement, ITest, ITestFail, ITestNone, ITestOk, ITestSome, ITestType, KeyCompareEqExpression, KeyCompareLessExpression, LambdaInvokeExpression, LiteralExpressionValue, LiteralNoneExpression, LiteralRegexExpression, LiteralSimpleExpression, LiteralTypeDeclValueExpression, MapEntryConstructorExpression, MatchStatement, NamedArgumentValue, NumericEqExpression, NumericGreaterEqExpression, NumericGreaterExpression, NumericLessEqExpression, NumericLessExpression, NumericNeqExpression, ParseAsTypeExpression, PositionalArgumentValue, PostfixAccessFromIndex, PostfixAccessFromName, PostfixAsConvert, PostfixAssignFields, PostfixInvoke, PostfixIsTest, PostfixLiteralKeyAccess, PostfixOp, PostfixOperation, PostfixOpTag, PostfixProjectFromNames, PredicateUFBodyImplementation, PrefixNegateOrPlusOpExpression, PrefixNotOpExpression, RefArgumentValue, ReturnMultiStatement, ReturnSingleStatement, ReturnVoidStatement, SafeConvertExpression, SelfUpdateStatement, SpecialConstructorExpression, SpreadArgumentValue, SqlConnectExpression, StandardBodyImplementation, Statement, StatementTag, SwitchStatement, SynthesisBodyImplementation, TaskAllExpression, TaskDashExpression, TaskMultiExpression, TaskRaceExpression, TaskRunExpression, ThisUpdateStatement, ValidateStatement, VariableAssignmentStatement, VariableDeclarationStatement, VariableInitializationStatement, VariableMultiAssignmentStatement, VariableMultiDeclarationStatement, VariableMultiInitializationStatement, VariableRetypeStatement, VarUpdateStatement, VoidRefCallStatement } from "./body.js";
 
 import { getBSQIRForm, getSMTForm, escapeCStringLiteral } from "@bosque/jsbrex";
@@ -194,6 +194,15 @@ class BSQIREmitter {
         }
     }
 
+    private emitAsyncInfo(asyncinfo: AsyncAnnotation): string {
+        if(asyncinfo === "yes") {
+            return "BSQAssembly::AsyncAnnotation#AsyncTag";
+        }
+        else{ 
+            return "BSQAssembly::AsyncAnnotation#NonAsyncTag";
+        }
+    }
+
     private static uniqueifyChildrenHelper(cl: string[]): string[] {
         const result: string[] = [];
 
@@ -249,11 +258,12 @@ class BSQIREmitter {
         else if(tt instanceof LambdaTypeSignature) {
             const tsbase = this.emitTypeSignatureBase(tt);
             const recinfo = this.emitRecInfo(tt.recursive);
+			const asyncinfo = this.emitAsyncInfo(tt.async);
             const ispred = tt.name === "pred";
             const tparams = tt.params.map((tp) => this.emitLambdaParameterSignature(tp)).join(", ");
             const tret = this.emitTypeSignature(tt.resultType);
 
-            return `BSQAssembly::LambdaTypeSignature{ ${tsbase}, frecursive=${recinfo}, isPredLambda=${ispred}, params=List<BSQAssembly::LambdaParameterSignature>{${tparams}}, resultType=${tret} }`;
+            return `BSQAssembly::LambdaTypeSignature{ ${tsbase}, frecursive=${recinfo}, isasync=${asyncinfo}, isPredLambda=${ispred}, params=List<BSQAssembly::LambdaParameterSignature>{${tparams}}, resultType=${tret} }`;
         }
         else {
             assert(false, "Unknown type signature " + ttype.tkeystr);
@@ -280,7 +290,7 @@ class BSQIREmitter {
         }
     }
 
-    private emitInvokeArgumentInfo(name: string, rec: RecursiveAnnotation, args: ArgumentValue[], shuffleinfo: [number, TypeSignature][], resttype: TypeSignature | undefined, restinfo: [number, boolean, TypeSignature][] | undefined): string {
+    private emitInvokeArgumentInfo(name: string, rec: RecursiveAnnotation, async: AsyncAnnotation, args: ArgumentValue[], shuffleinfo: [number, TypeSignature][], resttype: TypeSignature | undefined, restinfo: [number, boolean, TypeSignature][] | undefined): string {
         const sinfocc = shuffleinfo.map((si) => {
             const iidx = si[0] !== -1 ? `some(${si[0]}n)` : "none";
             return `(|${iidx}, ${this.emitTypeSignature(si[1])}|)`
@@ -293,10 +303,10 @@ class BSQIREmitter {
         const resttypecc = resttype !== undefined ? `some(${this.emitTypeSignature(resttype)})` : "none"
         const arglist = 'List<BSQAssembly::ArgumentValue>{' + args.map((arg) => this.emitArgumentValue(arg)).join(", ") + '}';
 
-        return `BSQAssembly::InvokeArgumentInfo{ name='${name}'<BSQAssembly::Identifier>, rec=${this.emitRecInfo(rec)}, srcargs=${arglist}, shuffleinfo=List<(|Option<Nat>, BSQAssembly::TypeSignature|)>{${sinfocc}}, resttype=${resttypecc}, restinfo=List<(|Nat, Bool, BSQAssembly::TypeSignature|)>{${restinfocc}}, resolvedargs=none }`;
+        return `BSQAssembly::InvokeArgumentInfo{ name='${name}'<BSQAssembly::Identifier>, rec=${this.emitRecInfo(rec)}, async=${this.emitAsyncInfo(async)} srcargs=${arglist}, shuffleinfo=List<(|Option<Nat>, BSQAssembly::TypeSignature|)>{${sinfocc}}, resttype=${resttypecc}, restinfo=List<(|Nat, Bool, BSQAssembly::TypeSignature|)>{${restinfocc}}, resolvedargs=none }`;
     }
 
-    private emitLambdaInvokeArgumentInfo(name: string, rec: RecursiveAnnotation, args: ArgumentValue[], stdargs: TypeSignature[], resttype: TypeSignature | undefined, restinfo: [number, boolean, TypeSignature][] | undefined): string {
+    private emitLambdaInvokeArgumentInfo(name: string, rec: RecursiveAnnotation, async: AsyncAnnotation, args: ArgumentValue[], stdargs: TypeSignature[], resttype: TypeSignature | undefined, restinfo: [number, boolean, TypeSignature][] | undefined): string {
         const stdargscc = `List<BSQAssembly::TypeSignature>{${stdargs.map((si) => this.emitTypeSignature(si)).join(", ")}}`;
 
         const restinfocc = (restinfo || []).map((ri) => {
@@ -306,7 +316,7 @@ class BSQIREmitter {
         const resttypecc = resttype !== undefined ? `some(${this.emitTypeSignature(resttype)})` : "none"
         const arglist = 'List<BSQAssembly::ArgumentValue>{' + args.map((arg) => this.emitArgumentValue(arg)).join(", ") + '}';
 
-        return `BSQAssembly::LambdaInvokeArgumentInfo{ name='${name}'<BSQAssembly::Identifier>, rec=${this.emitRecInfo(rec)}, srcargs=${arglist}, stdargs=${stdargscc}, resttype=${resttypecc}, restinfo=List<(|Nat, Bool, BSQAssembly::TypeSignature|)>{${restinfocc}}, resolvedargs=none }`;
+        return `BSQAssembly::LambdaInvokeArgumentInfo{ name='${name}'<BSQAssembly::Identifier>, rec=${this.emitRecInfo(rec)}, async=${this.emitAsyncInfo(async)}, srcargs=${arglist}, stdargs=${stdargscc}, resttype=${resttypecc}, restinfo=List<(|Nat, Bool, BSQAssembly::TypeSignature|)>{${restinfocc}}, resolvedargs=none }`;
     }
 
     private emitStdConstructorArgumentInfo(args: ArgumentValue[], shuffleinfo: [number, TypeSignature | undefined, string, TypeSignature][]): string {
@@ -633,7 +643,7 @@ class BSQIREmitter {
         const ebase = this.emitExpressionBase(exp);
 
         const lambda = exp.lambda as LambdaTypeSignature;
-        const argsinfo = this.emitLambdaInvokeArgumentInfo(exp.name, lambda.recursive, exp.args.args, exp.arginfo, exp.resttype, exp.restinfo);
+        const argsinfo = this.emitLambdaInvokeArgumentInfo(exp.name, lambda.recursive, lambda.async, exp.args.args, exp.arginfo, exp.resttype, exp.restinfo);
 
         return `BSQAssembly::LambdaInvokeExpression{ ${ebase}, isCapturedLambda=${exp.isCapturedLambda}, lambda=${this.emitTypeSignature(exp.lambda as TypeSignature)}, fname='${exp.name}'<BSQAssembly::Identifier>, argsinfo=${argsinfo} }`;
     }
@@ -663,7 +673,7 @@ class BSQIREmitter {
         const nskey = EmitNameManager.generateNamespaceKey(exp.ns);
         const ikey = EmitNameManager.generateNamespaceInvokeKey(exp.ns, exp.name, exp.terms.map((t) => this.tproc(t)));
 
-        const arginfo = this.emitInvokeArgumentInfo(exp.name, ffinv.recursive, exp.args.args, exp.shuffleinfo, exp.resttype, exp.restinfo);
+        const arginfo = this.emitInvokeArgumentInfo(exp.name, ffinv.recursive, ffinv.async, exp.args.args, exp.shuffleinfo, exp.resttype, exp.restinfo);
 
         // CallNSExprs provide expression (not AbstractDecl), so we need to emit fullns explicitly
         const cstrns = exp.ns.ns.map(e => `'${e}'`).join(", ");
@@ -683,7 +693,7 @@ class BSQIREmitter {
             return `BSQAssembly::CallTypeFunctionSpecialExpression{ ${ebase}, ikey='${ikey}'<BSQAssembly::InvokeKey>, ttype=${ttype}, resolvedDeclType=${resolvedDeclType}, name='${exp.name}'<BSQAssembly::Identifier>, exp=${eexp}}`;
         }
         else {
-            const argsinfo = this.emitInvokeArgumentInfo(exp.name, exp.rec, exp.args.args, exp.shuffleinfo, exp.resttype, exp.restinfo); 
+            const argsinfo = this.emitInvokeArgumentInfo(exp.name, exp.rec, exp.async, exp.args.args, exp.shuffleinfo, exp.resttype, exp.restinfo); 
             return `BSQAssembly::CallTypeFunctionExpression{ ${ebase}, ikey='${ikey}'<BSQAssembly::InvokeKey>, ttype=${ttype}, resolvedDeclType=${resolvedDeclType}, argsinfo=${argsinfo}}`;
         }
     }
@@ -780,7 +790,7 @@ class BSQIREmitter {
         const tsig = this.emitTypeSignature(rtrgt);
         const ikey = EmitNameManager.generateTypeInvokeKey(rtrgt, exp.name, exp.terms.map((t) => this.tproc(t)));
 
-        const arginfo = this.emitInvokeArgumentInfo(exp.name, rdecl.recursive, exp.args.args, exp.shuffleinfo, exp.resttype, exp.restinfo);
+        const arginfo = this.emitInvokeArgumentInfo(exp.name, rdecl.recursive, rdecl.async, exp.args.args, exp.shuffleinfo, exp.resttype, exp.restinfo);
 
         return `BSQAssembly::PostfixInvokeStatic{ ${opbase},  resolvedType=${tsig}, resolvedTrgt='${ikey}'<BSQAssembly::InvokeKey>, argsinfo=${arginfo} }`;
     }
@@ -1793,13 +1803,14 @@ class BSQIREmitter {
 
         const ikeystr = `ikey='${ikey}'<BSQAssembly::InvokeKey>`;
         const isrecursive = `irecursive=${this.emitRecInfo(decl.recursive)}`;
+		const isasync = `isasync=${this.emitAsyncInfo(decl.async)}`;
         const params = `params=List<BSQAssembly::InvokeParameterDecl>{ ${decl.params.map((p) => this.emitInvokeParameterDecl(p))} }`;
         const resultType = `resultType=${this.emitTypeSignature(decl.resultType)}`;
 
         const body = this.emitBodyImplementation(decl.body, fmt);
         const bodystr = `body=${body}`;
 
-        return `${dbase},${fmt.nl() + fmt.indent(ikeystr)}, ${isrecursive},${fmt.nl() + fmt.indent(params)},${fmt.nl() + fmt.indent(resultType)},${fmt.nl() + fmt.indent(bodystr)}`;
+        return `${dbase},${fmt.nl() + fmt.indent(ikeystr)},${isrecursive},${isasync},${fmt.nl() + fmt.indent(params)},${fmt.nl() + fmt.indent(resultType)},${fmt.nl() + fmt.indent(bodystr)}`;
     }
 
     private emitExplicitInvokeDecl(decl: ExplicitInvokeDecl, nskey: string, ikey: string, fmt: BsqonCodeFormatter): string {

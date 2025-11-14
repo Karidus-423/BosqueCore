@@ -6,6 +6,7 @@
 //Global keywords
 const KW_recursive_q = "recursive?";
 const KW_recursive = "recursive";
+const KW_async = "async";
 
 const KW_action = "action";
 const KW__debug = "_debug";
@@ -85,6 +86,7 @@ const KW_operator = "operator";
 const KeywordStrings = [
     KW_recursive_q,
     KW_recursive,
+	KW_async,
     
     KW_api,
     KW_as,
@@ -321,6 +323,7 @@ export {
 
     KW_recursive_q,
     KW_recursive,
+	KW_async,
     
     KW_api,
     KW_as,

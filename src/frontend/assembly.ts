@@ -1,5 +1,5 @@
 
-import { FullyQualifiedNamespace, TypeSignature, LambdaTypeSignature, RecursiveAnnotation, TemplateTypeSignature, VoidTypeSignature, LambdaParameterSignature, AutoTypeSignature, NominalTypeSignature } from "./type.js";
+import { FullyQualifiedNamespace, TypeSignature, LambdaTypeSignature, AsyncAnnotation, RecursiveAnnotation, TemplateTypeSignature, VoidTypeSignature, LambdaParameterSignature, AutoTypeSignature, NominalTypeSignature } from "./type.js";
 import { Expression, BodyImplementation, ConstantExpressionValue, LiteralExpressionValue, ExpressionTag, AccessNamespaceConstantExpression, LiteralRegexExpression } from "./body.js";
 
 import { BuildLevel, CodeFormatter, SourceInfo } from "./build_decls.js";
@@ -257,16 +257,18 @@ class InvokeParameterDecl {
 
 abstract class AbstractInvokeDecl extends AbstractCoreDecl {
     readonly recursive: RecursiveAnnotation;
+	readonly async: AsyncAnnotation;
 
     readonly params: InvokeParameterDecl[];
     readonly resultType: TypeSignature;
 
     readonly body: BodyImplementation;
 
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation) {
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation) {
         super(file, sinfo, attributes, name);
 
         this.recursive = recursive;
+		this.async = async;
 
         this.params = params;
         this.resultType = resultType;
@@ -282,25 +284,30 @@ abstract class AbstractInvokeDecl extends AbstractCoreDecl {
             rec = this.recursive === "yes" ? "recursive " : "recursive? ";
         }
 
+        let async = "";
+        if (this.async !== "no") {
+            async = this.async === "yes" ? "async " : "";
+        }
+
         let params = this.params.map((p) => p.emit(fmt)).join(", ");
         let result = (this.resultType instanceof VoidTypeSignature) ? "" : (": " + this.resultType.emit());
 
-        return [`${attrs}${rec}`, `(${params})${result}`];
+        return [`${attrs}${rec}${async}`, `(${params})${result}`];
     }
 }
 
 class LambdaDecl extends AbstractInvokeDecl {
     readonly isAuto: boolean;
 
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: "fn" | "pred", recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, isAuto: boolean) {
-        super(file, sinfo, attributes, name, recursive, params, resultType, body);
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: "fn" | "pred", recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, isAuto: boolean) {
+        super(file, sinfo, attributes, name, recursive, async, params, resultType, body);
 
         this.isAuto = isAuto;
     }
 
     generateSig(sinfo: SourceInfo): TypeSignature {
         const lpsigs = this.params.map((p) => new LambdaParameterSignature(p.name, p.type, p.isRefParam, p.isRestParam));
-        return new LambdaTypeSignature(sinfo, this.recursive, this.name as ("fn" | "pred"), lpsigs, this.resultType);
+        return new LambdaTypeSignature(sinfo, this.recursive, this.async, this.name as ("fn" | "pred"), lpsigs, this.resultType);
     }
 
     override emitSig(fmt: CodeFormatter): [string, string] {
@@ -311,10 +318,15 @@ class LambdaDecl extends AbstractInvokeDecl {
             rec = this.recursive === "yes" ? "recursive " : "recursive? ";
         }
 
+        let async = "";
+        if (this.async !== "no") {
+            async = this.async === "yes" ? "async " : "";
+        }
+
         let params = this.params.map((p) => p.emit(fmt)).join(", ");
         let result = (this.resultType instanceof AutoTypeSignature) ? "" : (": " + this.resultType.emit());
 
-        return [`${attrs}${rec}`, `(${params})${result}`];
+        return [`${attrs}${rec}${async}`, `(${params})${result}`];
     }
 
     emit(fmt: CodeFormatter): string {
@@ -331,8 +343,8 @@ abstract class ExplicitInvokeDecl extends AbstractInvokeDecl {
     readonly preconditions: PreConditionDecl[];
     readonly postconditions: PostConditionDecl[];
 
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[]) {
-        super(file, sinfo, attributes, name, recursive, params, resultType, body);
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[]) {
+        super(file, sinfo, attributes, name, recursive, async, params, resultType, body);
 
         this.terms = terms;
         this.termRestriction = termRestriction;
@@ -383,8 +395,8 @@ abstract class ExplicitInvokeDecl extends AbstractInvokeDecl {
 }
 
 abstract class FunctionInvokeDecl extends ExplicitInvokeDecl {
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[]) {
-        super(file, sinfo, attributes, name, recursive, params, resultType, body, terms, termRestriction, preconditions, postconditions);
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[]) {
+        super(file, sinfo, attributes, name, recursive, async, params, resultType, body, terms, termRestriction, preconditions, postconditions);
     }
 }
 
@@ -422,8 +434,8 @@ class NamespaceFunctionDecl extends FunctionInvokeDecl {
     readonly fkind: "function" | "predicate" | "errtest" | "chktest" | "example";
     readonly tassoc: TestAssociation[] | undefined;
 
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[], tassoc: TestAssociation[] | undefined, fkind: "function" | "predicate" | "errtest" | "chktest" | "example") {
-        super(file, sinfo, attributes, name, recursive, params, resultType, body, terms, termRestriction, preconditions, postconditions);
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[], tassoc: TestAssociation[] | undefined, fkind: "function" | "predicate" | "errtest" | "chktest" | "example") {
+        super(file, sinfo, attributes, name, recursive, async, params, resultType, body, terms, termRestriction, preconditions, postconditions);
 
         this.fkind = fkind;
         this.tassoc = tassoc;
@@ -435,8 +447,8 @@ class NamespaceFunctionDecl extends FunctionInvokeDecl {
 }
 
 class TypeFunctionDecl extends FunctionInvokeDecl {
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[]) {
-        super(file, sinfo, attributes, name, recursive, params, resultType, body, terms, termRestriction, preconditions, postconditions);
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[]) {
+        super(file, sinfo, attributes, name, recursive, async, params, resultType, body, terms, termRestriction, preconditions, postconditions);
     }
 
     getDeclarationTag(): string {
@@ -447,8 +459,8 @@ class TypeFunctionDecl extends FunctionInvokeDecl {
 class MethodDecl extends ExplicitInvokeDecl {
     readonly isThisRef: boolean;
 
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[], isThisRef: boolean) {
-        super(file, sinfo, attributes, name, recursive, params, resultType, body, terms, termRestriction, preconditions, postconditions);
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[], isThisRef: boolean) {
+        super(file, sinfo, attributes, name, recursive, async, params, resultType, body, terms, termRestriction, preconditions, postconditions);
 
         this.isThisRef = isThisRef;
     }
@@ -461,8 +473,8 @@ class MethodDecl extends ExplicitInvokeDecl {
 class TaskMethodDecl extends ExplicitInvokeDecl {
     readonly isSelfRef: boolean;
 
-    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[], isSelfRef: boolean) {
-        super(file, sinfo, attributes, name, recursive, params, resultType, body, terms, termRestriction, preconditions, postconditions);
+    constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, recursive: "yes" | "no" | "cond", async: "yes" | "no", params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[], isSelfRef: boolean) {
+        super(file, sinfo, attributes, name, recursive, async, params, resultType, body, terms, termRestriction, preconditions, postconditions);
 
         this.isSelfRef = isSelfRef;
     }
@@ -474,7 +486,7 @@ class TaskMethodDecl extends ExplicitInvokeDecl {
 
 class TaskActionDecl extends ExplicitInvokeDecl {
     constructor(file: string, sinfo: SourceInfo, attributes: DeclarationAttibute[], name: string, params: InvokeParameterDecl[], resultType: TypeSignature, body: BodyImplementation, terms: InvokeTemplateTermDecl[], termRestriction: InvokeTemplateTypeRestriction | undefined, preconditions: PreConditionDecl[], postconditions: PostConditionDecl[]) {
-        super(file, sinfo, attributes, name, "no", params, resultType, body, terms, termRestriction, preconditions, postconditions);
+        super(file, sinfo, attributes, name, "no", "no", params, resultType, body, terms, termRestriction, preconditions, postconditions);
     }
 
     getDeclarationTag(): string {

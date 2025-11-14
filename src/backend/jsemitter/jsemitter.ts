@@ -2670,8 +2670,10 @@ class JSEmitter {
         const body = this.emitBodyImplementation(fdecl.body, false, initializers, preconds, refsaves, optrefv !== undefined ? optrefv.name : undefined, resf, fmt);
         this.mapper = omap;
 
+        const async = fdecl.async === "yes" ? "async " : "";
         const [nf, nss] = fdecl instanceof NamespaceFunctionDecl ? EmitNameManager.generateDeclarationNameForNamespaceFunction(this.getCurrentNamespace(), fdecl as NamespaceFunctionDecl, optmapping) : [EmitNameManager.generateDeclarationNameForTypeFunction(fdecl as TypeFunctionDecl, optmapping), true];
-        const decl = `${sig}${nss ? " => " : " "}${body}`;
+        const decl = `${async}${sig}${nss ? " => " : " "}${body}`;
+
         let bdecl: string;
         if(fdecl instanceof NamespaceFunctionDecl || optmapping !== undefined) {
             bdecl = `${nf}${decl}`;

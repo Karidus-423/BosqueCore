@@ -1,6 +1,6 @@
 import assert from "node:assert";
 
-import { FullyQualifiedNamespace, AutoTypeSignature, RecursiveAnnotation, TypeSignature, LambdaTypeSignature, NominalTypeSignature } from "./type.js";
+import { FullyQualifiedNamespace, AutoTypeSignature, RecursiveAnnotation, TypeSignature, LambdaTypeSignature, NominalTypeSignature, AsyncAnnotation } from "./type.js";
 
 import { BuildLevel, CodeFormatter, SourceInfo } from "./build_decls.js";
 import { LambdaDecl, MemberFieldDecl, MethodDecl, NamespaceDeclaration } from "./assembly.js";
@@ -644,6 +644,7 @@ class CallTypeFunctionExpression extends Expression {
     readonly ttype: TypeSignature;
     readonly name: string;
     readonly rec: RecursiveAnnotation;
+	readonly async: AsyncAnnotation;
     readonly terms: TypeSignature[];
     readonly args: ArgumentList;
 
@@ -653,11 +654,12 @@ class CallTypeFunctionExpression extends Expression {
     resttype: TypeSignature | undefined = undefined;
     restinfo: [number, boolean, TypeSignature][] | undefined = undefined;
 
-    constructor(sinfo: SourceInfo, ttype: TypeSignature, name: string, terms: TypeSignature[], rec: RecursiveAnnotation, args: ArgumentList) {
+    constructor(sinfo: SourceInfo, ttype: TypeSignature, name: string, terms: TypeSignature[], rec: RecursiveAnnotation, async: AsyncAnnotation, args: ArgumentList) {
         super(ExpressionTag.CallTypeFunctionExpression, sinfo);
         this.ttype = ttype;
         this.name = name;
         this.rec = rec;
+		this.async = async;
         this.terms = terms;
         this.args = args;
     }
@@ -667,13 +669,18 @@ class CallTypeFunctionExpression extends Expression {
         if(this.rec !== "no") {
             rec = "[" + (this.rec === "yes" ? "recursive" : "recursive?") + "]";
         }
+
+        let async = "";
+        if(this.async !== "no") {
+            async = "[" + (this.async === "yes" ? "async" : "") + "]";
+        }
         
         let terms = "";
         if(this.terms.length !== 0) {
             terms = "<" + this.terms.map((tt) => tt.emit()).join(", ") + ">";
         }
 
-        return `${this.ttype.emit()}::${this.name}${rec}${terms}${this.args.emit(fmt, "(", ")")}`;
+        return `${this.ttype.emit()}::${this.name}${rec}${async}${terms}${this.args.emit(fmt, "(", ")")}`;
     }
 }
 

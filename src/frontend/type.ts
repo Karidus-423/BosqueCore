@@ -320,6 +320,7 @@ class EListTypeSignature extends TypeSignature {
 }
 
 type RecursiveAnnotation = "yes" | "no" | "cond";
+type AsyncAnnotation = "yes" | "no";
 
 class LambdaParameterSignature {
     readonly name: string | undefined; //optional name for the parameter
@@ -341,13 +342,15 @@ class LambdaParameterSignature {
 
 class LambdaTypeSignature extends TypeSignature {
     readonly recursive: RecursiveAnnotation;
+	readonly async: AsyncAnnotation;
     readonly name: "fn" | "pred";
     readonly params: LambdaParameterSignature[];
     readonly resultType: TypeSignature;
 
-    constructor(sinfo: SourceInfo, recursive: RecursiveAnnotation, name: "fn" | "pred", params: LambdaParameterSignature[], resultType: TypeSignature) {
+    constructor(sinfo: SourceInfo, recursive: RecursiveAnnotation, async: AsyncAnnotation, name: "fn" | "pred", params: LambdaParameterSignature[], resultType: TypeSignature) {
         super(sinfo, `${recursive === "yes" ? "rec " : ""}${name}(${params.map((pp) => pp.emit()).join(", ")}): ${resultType.tkeystr}`);
         this.recursive = recursive;
+		this.async = async;
         this.name = name;
         this.params = params;
         this.resultType = resultType;
@@ -355,7 +358,7 @@ class LambdaTypeSignature extends TypeSignature {
 
     remapTemplateBindings(mapper: TemplateNameMapper): TypeSignature {
         const rbparams = this.params.map((pp) => new LambdaParameterSignature(pp.name, pp.type.remapTemplateBindings(mapper), pp.isRefParam, pp.isRestParam));
-        return new LambdaTypeSignature(this.sinfo, this.recursive, this.name, rbparams, this.resultType.remapTemplateBindings(mapper));
+        return new LambdaTypeSignature(this.sinfo, this.recursive, this.async, this.name, rbparams, this.resultType.remapTemplateBindings(mapper));
     }
 
     emit(): string {
@@ -366,8 +369,14 @@ class LambdaTypeSignature extends TypeSignature {
         else if(this.recursive === "cond") {
             recstr = "recursive? ";
         }
+
+		let asyncstr = "";
+		if(this.async === "yes"){
+			asyncstr = "async";
+		}
         
-        return `${recstr}${this.name}(${this.params.map((pp) => pp.emit()).join(", ")}) -> ${this.resultType.emit()}`;
+		//NOTE: Might be a better way to decide which of the two {recstr} or {asyncstr} to use in here.
+        return `${recstr}${asyncstr}${this.name}(${this.params.map((pp) => pp.emit()).join(", ")}) -> ${this.resultType.emit()}`;
     }
 }
 
@@ -376,5 +385,5 @@ export {
     TypeSignature, ErrorTypeSignature, VoidTypeSignature, AutoTypeSignature, 
     TemplateTypeSignature, NominalTypeSignature, 
     EListTypeSignature,
-    RecursiveAnnotation, LambdaParameterSignature, LambdaTypeSignature
+    AsyncAnnotation, RecursiveAnnotation, LambdaParameterSignature, LambdaTypeSignature
 };
