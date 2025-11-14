@@ -2,13 +2,50 @@ namespace Core;
 
 
 namespace SQL{
+	type Connection_ = Int;
 	entity SQLConnection{
-		%%Find Database
-			%%Create Database
+		%%Field `process` is used to pass the actual `connection` in JS.
+		field process: Connection_;
+		field host: String;
+		field user: String;
+
+		function locateDB(db:String, connection: Connection_): SQLDatabase = sql_locateDB;
+
+		method createDatabase(db: String){
+			%%Create the Database in SQL
+			%%Create the SQLDatabase object and reuturn it.
+			;
+		}
+		method findDatabase(db : String){
+			%%function equal(cb1: CCharBuffer, cb2: CCharBuffer): Bool = ccharbuffer_equal;
+			%%Use the database. Create it if not found.
+			;
+		}
+	}
+
+	entity SQLDatabase{
+		field connection: SQLConnection;
+		field id_name: String;
+		field tables: List<SQLTable>;
+
+		method createTable(table_id: String, %*Self connection_id*%){
+			;
+		}
+
+		method findTable(table_id: String, %*Self connection_id*%){
+			;
+		}
+	}
+
+	entity SQLTable{
 	}
 
 	%%On await rejection return None.
 	function createConnection(host : String, user : String, password: String): SQLConnection{
-		return XCore::s_sqlConnection<String,SQLConnection>(host,user,password);
+		%%1. Pass all arguments to mysql2.createConnection.
+		let conn_id = XCore::s_sqlConnection<String,Connection_>(host,user,password);
+		let connection = SQLConnection{conn_id,host,user};
+		return connection;
+		%%2. Return SQLConnection entity.
 	}
 }

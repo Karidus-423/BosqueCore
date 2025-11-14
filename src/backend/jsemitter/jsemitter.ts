@@ -16,6 +16,7 @@ const prefix =
 'import { $VRepr, _$softfails, _$supertypes, _$fisSubtype, _$fisNotSubtype, _$fasSubtype, _$fasNotSubtype, _$None, _$not, _$negate, _$add, _$sub, _$mult, _$div, _$bval, _$fkeq, _$fkeqopt, _$fkneq, _$fkneqopt, _$fkless, _$fnumeq, _$fnumless, _$fnumlesseq, _$exhaustive, _$abort, _$assert, _$formatchk, _$invariant, _$validate, _$precond, _$softprecond, _$postcond, _$softpostcond, _$memoconstval, _$accepts } from "./runtime.mjs";\n' +
 'import { _$setnone_lit, _$parsemap, _$emitmap, _$parseBSQON, _$emitBSQON } from "./bsqon.mjs";\n' +
 'import { _$extractMock } from "./smtextract.mjs";\n' +
+'import mysql from "mysql2/promise";\n'+
 '\n'
 ;
 
@@ -872,7 +873,9 @@ class JSEmitter {
     }
 
 	private emitSqlConnectExpression(exp: SqlConnectExpression, toplevel: boolean): string{
-		return exp.emit(toplevel);
+		const fmt = new CodeFormatter;
+
+        return `${exp.emit(toplevel,fmt)}`;
 	}
     
     private emitPostfixAccessFromName(val: string, exp: PostfixAccessFromName): string {

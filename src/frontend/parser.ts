@@ -2953,17 +2953,18 @@ class Parser {
             }
 
 			if(name === "s_sqlConnection"){
-				const needed_args = 3;
-				const needed_templates = 2;
-                if(targs.length !== needed_templates) {
-                    this.recordErrorGeneral(sinfo, `SqlConnection expects exactly ${needed_templates} template arguments`);
+				const n_args = 3;
+				const n_templates = 2;
+                if(targs.length !== n_templates) {
+                    this.recordErrorGeneral(sinfo, `SqlConnection expects exactly ${n_templates} template arguments`);
                 }
 
-                if(args.args.length !== needed_args || !args.args.every((arg) => arg instanceof PositionalArgumentValue)) {
-                    this.recordErrorGeneral(sinfo, `SqlConnection expects exactly ${needed_args} positional arguments`);
+                if(args.args.length !== n_args || !args.args.every((arg) => arg instanceof PositionalArgumentValue)) {
+                    this.recordErrorGeneral(sinfo, `SqlConnection expects exactly ${n_args} positional arguments`);
                 }
 
-				return new SqlConnectExpression(sinfo, args, name, (args.args[0] as PositionalArgumentValue).exp, targs[0], targs[1]);
+				//NOTE: (args.args[0] as ...), might be a bug during the Checker. As its only used here to pass the checker.
+				return new SqlConnectExpression(sinfo, args, (args.args[0] as PositionalArgumentValue).exp,targs[0], targs[1]);
 			}
         }
 

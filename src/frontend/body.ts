@@ -805,27 +805,25 @@ class CreateDirectExpression extends Expression {
 }
 
 class SqlConnectExpression extends Expression{
-	readonly name: string;
 	readonly args: ArgumentList;
-    readonly exp: Expression;
+	readonly exp: Expression;
     readonly srctype: TypeSignature;
     readonly trgttype: TypeSignature;
 
-    constructor(sinfo: SourceInfo, args: ArgumentList, name: string, exp: Expression, srctype: TypeSignature, trgttype: TypeSignature) {
+    constructor(sinfo: SourceInfo, args: ArgumentList, exp: Expression, srctype: TypeSignature, trgttype: TypeSignature) {
         super(ExpressionTag.SqlConnectExpression, sinfo);
 		this.args = args;
-		this.name = name;
 		this.exp = exp;
 		this.srctype = srctype;
 		this.trgttype = trgttype;
     }
 
-    emit(toplevel: boolean): string {
-		return `const ${this.name} = await mysql.createConnection({
-			host: "${this.args.args.at(0)}",
-			user: "${this.args.args.at(1)}",
-			password: "${this.args.args.at(2)}",
-		});`
+    emit(toplevel: boolean, fmt: CodeFormatter): string {
+		return ` await mysql.createConnection({
+			host: ${this.args.args.at(0)?.emit(fmt)},
+			user: ${this.args.args.at(1)?.emit(fmt)},
+			password: ${this.args.args.at(2)?.emit(fmt)},
+		})`
 
     }
 }

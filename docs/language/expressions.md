@@ -181,7 +181,11 @@ function foo(): {f: Int, g: Boolean?} {
 ```
 
 ## Entity Constructors
-Object-oriented programming in Bosque is centered around _Concepts_ and _Entities_ (see [Types](types.md)) which roughly correspond to objects and abstract classes/interfaces in other languages. These types can be defined explicitly using `entity` or `concept` declarations and are also implicitly created via `typedecl` or `datatype` declarations. Examples of simple OO construction are:
+Object-oriented programming in Bosque is centered around _Concepts_ and _Entities_
+(see [Types](types.md)) which roughly correspond to objects and abstract classes/interfaces
+in other languages. These types can be defined explicitly using `entity` or `concept
+` declarations and are also implicitly created via `typedecl` or `datatype` declarations
+. Examples of simple OO construction are:
 ```none
 entity Foo {
     field f: Int;
