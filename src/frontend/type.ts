@@ -348,7 +348,7 @@ class LambdaTypeSignature extends TypeSignature {
     readonly resultType: TypeSignature;
 
     constructor(sinfo: SourceInfo, recursive: RecursiveAnnotation, async: AsyncAnnotation, name: "fn" | "pred", params: LambdaParameterSignature[], resultType: TypeSignature) {
-        super(sinfo, `${recursive === "yes" ? "rec " : ""}${name}(${params.map((pp) => pp.emit()).join(", ")}): ${resultType.tkeystr}`);
+        super(sinfo, `${recursive === "yes" ? "rec " : ""}${async === "yes" ? "async " : ""}${name}(${params.map((pp) => pp.emit()).join(", ")}): ${resultType.tkeystr}`);
         this.recursive = recursive;
 		this.async = async;
         this.name = name;

@@ -2221,7 +2221,7 @@ class Parser {
 
         let isasync: "yes" | "no" = "no";
         if(this.testToken(KW_async)) {
-            isrecursive = this.testToken(KW_async) ? "yes" : "no";
+            isasync = this.testToken(KW_async) ? "yes" : "no";
             this.consumeToken();
         }
 
