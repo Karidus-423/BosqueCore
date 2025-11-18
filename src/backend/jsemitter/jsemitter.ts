@@ -2384,6 +2384,15 @@ class JSEmitter {
 					 var val = _$parseBSQON(extracted.types,extracted.value)[0];`;
 			bop = `val`;
 		}
+		else if(bname == "sql_checkDB"){
+			bop = "await connection.process().execute(`CREATE DATABASE IF NOT EXISTS ${db_id}`)";
+		}
+		else if(bname == "sql_fetchDB"){
+			bop = `connection.process().query("GET")`;
+		}
+		else if(bname == "sql_initializeDB"){
+			bop = `connection.process().query("CREATE")`;
+		}
         else {
             assert(false, `Unknown builtin function -- ${bname}`);
         }
@@ -2805,7 +2814,8 @@ class JSEmitter {
         this.mapper = omap;
 
         const nf = EmitNameManager.generateDeclarationNameForMethod(rcvrtype[0], mdecl, optmapping);
-        const decl = `function${sig} ${body}`;
+		const async = mdecl.async === "yes" ? "async " : "";
+        const decl = `${async}function${sig} ${body}`;
         let bdecl: string;
         if(optmapping !== undefined) {
             bdecl = `${nf}${decl}`;

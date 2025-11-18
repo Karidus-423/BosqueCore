@@ -2,31 +2,30 @@ namespace Core;
 
 
 namespace SQL{
+	%%NOTE: On JS emission, this behaves as the SQL2 connection object.
 	type Connection_ = Int;
 	entity SQLConnection{
-		%%Field `process` is used to pass the actual `connection` in JS.
 		field process: Connection_;
 		field host: String;
 		field user: String;
 
-		method checkDB(db:String, connection: Connection_): Bool = sql_checkDB;
+		async method findDB(db_id:String, connection: Connection_): Bool = sql_checkDB;
+		async method fetchDB(db_id:String, connection: Connection_): SQLDatabase = sql_fetchDB;
+		async method initializeDB(db_id:String, connection:Connection_): SQLDatabase = sql_initializeDB;
 
-		method createDatabase(db: String){
-			%%Create the Database in SQL.
-			%%On Success return the SQLDatabase entity, giving an empty tables field.
-			%%This can fail. On Failure return error.
-			;
+		%%TODO: Return Failure.
+		method createDatabase(db_id: String): SQLDatabase{
+			return this.initializeDB(db_id, this.process);
 		}
-		method findDatabase(db : String){
-			%%Returns if database has been found.
-			var found_db = this.checkDB(db, this.process);
-			%%TODO
-			%%If true, scan the tables of the database and return SQLDatabase entity.
-			%%If false, return create the Database and return the SQLDatabase entity.
-			%%function equal(cb1: CCharBuffer, cb2: CCharBuffer): Bool = ccharbuffer_equal;
-			%%Use the database. Create it if not found.
-			%%This can fail. On failure return error.
-			;
+
+		%%TODO: Return Failure.
+		method getDatabase(db_id : String): SQLDatabase{
+			var found_db = this.findDB(db_id, this.process);
+			if(found_db){
+				return this.fetchDB(db_id,this.process);
+			}else{
+				return this.createDatabase(db_id);
+			}
 		}
 	}
 
