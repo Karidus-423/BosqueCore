@@ -160,16 +160,16 @@ class EmitNameManager {
         }
     }
 
-    static generateDeclarationNameForNamespaceFunction(currentns: NamespaceDeclaration, fv: NamespaceFunctionDecl, mapper: TemplateNameMapper | undefined): [string, boolean] {
+    static generateDeclarationNameForNamespaceFunction(currentns: NamespaceDeclaration, fv: NamespaceFunctionDecl, mapper: TemplateNameMapper | undefined, async: string): [string, boolean] {
         const nns = EmitNameManager.emitNamespaceAccess(currentns, currentns);
 
         if(nns === "") {
             if(fv.terms.length === 0) {
-                return [`export function ${fv.name}`, false];
+                return [`export ${async}function ${fv.name}`, false];
             }
             else {
                 const termstr = `<${fv.terms.map((t) => (mapper as TemplateNameMapper).resolveTemplateMapping(new TemplateTypeSignature(SourceInfo.implicitSourceInfo(), t.name)).tkeystr).join(", ")}>`;
-                return [`"${termstr}": `, true];
+                return [`"/*hmmmm*/${termstr}": `, true];
             }
         }
         else {

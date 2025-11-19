@@ -4,6 +4,9 @@ namespace Core;
 namespace SQL{
 	%%NOTE: On JS emission, this behaves as the SQL2 connection object.
 	type Connection_ = Int;
+	%%NOTE: On JS emission, this behaves as an promise failure or any kind of possible failure that
+	%%can be returned by the connection.
+	type Error_ = Int;
 	entity SQLConnection{
 		field process: Connection_;
 		field host: String;
@@ -14,12 +17,12 @@ namespace SQL{
 		async method initializeDB(db_id:String, connection:Connection_): SQLDatabase = sql_initializeDB;
 
 		%%TODO: Return Failure.
-		method createDatabase(db_id: String): SQLDatabase{
+		async method createDatabase(db_id: String): SQLDatabase{
 			return this.initializeDB(db_id, this.process);
 		}
 
 		%%TODO: Return Failure.
-		method getDatabase(db_id : String): SQLDatabase{
+		async method getDatabase(db_id : String): SQLDatabase{
 			var found_db = this.findDB(db_id, this.process);
 			if(found_db){
 				return this.fetchDB(db_id,this.process);

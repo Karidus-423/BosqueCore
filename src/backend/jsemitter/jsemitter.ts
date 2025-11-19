@@ -2385,13 +2385,14 @@ class JSEmitter {
 			bop = `val`;
 		}
 		else if(bname == "sql_checkDB"){
-			bop = "await connection.process().execute(`CREATE DATABASE IF NOT EXISTS ${db_id}`)";
+			preop = "const [rows] = await connection.query( 'SHOW DATABASES LIKE ?', [db_id]);";
+			bop = "rows.length > 0;";
 		}
 		else if(bname == "sql_fetchDB"){
-			bop = `connection.process().query("GET")`;
+			bop = "await connection.query(`USE ${db_id}`)";
 		}
 		else if(bname == "sql_initializeDB"){
-			bop = `connection.process().query("CREATE")`;
+			bop = "await connection.execute(`CREATE DATABASE IF NOT EXISTS ${db_id}`)";
 		}
         else {
             assert(false, `Unknown builtin function -- ${bname}`);
@@ -2679,9 +2680,10 @@ class JSEmitter {
         const body = this.emitBodyImplementation(fdecl.body, false, initializers, preconds, refsaves, optrefv !== undefined ? optrefv.name : undefined, resf, fmt);
         this.mapper = omap;
 
-        const async = fdecl.async === "yes" ? "async " : "";
-        const [nf, nss] = fdecl instanceof NamespaceFunctionDecl ? EmitNameManager.generateDeclarationNameForNamespaceFunction(this.getCurrentNamespace(), fdecl as NamespaceFunctionDecl, optmapping) : [EmitNameManager.generateDeclarationNameForTypeFunction(fdecl as TypeFunctionDecl, optmapping), true];
-        const decl = `${async}${sig}${nss ? " => " : " "}${body}`;
+		const async = fdecl.async === "yes" ? "async " : "";
+        const [nf, nss] = fdecl instanceof NamespaceFunctionDecl ? EmitNameManager.generateDeclarationNameForNamespaceFunction(this.getCurrentNamespace(), fdecl as NamespaceFunctionDecl, optmapping, async) : [EmitNameManager.generateDeclarationNameForTypeFunction(fdecl as TypeFunctionDecl, optmapping), true];
+		//NOTE: ${nss ? `${async}` : ""} is to add async to namespace functions.
+		const decl = `${nss ? `${async}` : ""}${sig}${nss ? " => " : " "}${body}`;
 
         let bdecl: string;
         if(fdecl instanceof NamespaceFunctionDecl || optmapping !== undefined) {
@@ -2814,8 +2816,7 @@ class JSEmitter {
         this.mapper = omap;
 
         const nf = EmitNameManager.generateDeclarationNameForMethod(rcvrtype[0], mdecl, optmapping);
-		const async = mdecl.async === "yes" ? "async " : "";
-        const decl = `${async}function${sig} ${body}`;
+        const decl = `function${sig} ${body}`;
         let bdecl: string;
         if(optmapping !== undefined) {
             bdecl = `${nf}${decl}`;
@@ -3726,7 +3727,7 @@ class JSEmitter {
             const eexp = this.emitExpression(m.value.exp, true);
             const lexp = `() => ${eexp}`;
 
-            const fmtstyle = inns.isTopNamespace() ? `export function ${m.name}()` : `${m.name}: () =>`;
+            const fmtstyle = inns.isTopNamespace() ? `export /*test 1 */function ${m.name}()` : `${m.name}: () =>`;
             cdecls.push(`${fmtstyle} { return _$memoconstval(_$consts, "${inns.fullnamespace.emit() + "::" + m.name}", ${lexp}); }`);
         }
 
