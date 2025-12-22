@@ -169,7 +169,7 @@ class EmitNameManager {
             }
             else {
                 const termstr = `<${fv.terms.map((t) => (mapper as TemplateNameMapper).resolveTemplateMapping(new TemplateTypeSignature(SourceInfo.implicitSourceInfo(), t.name)).tkeystr).join(", ")}>`;
-                return [`"/*hmmmm*/${termstr}": `, true];
+                return [`"${termstr}": `, true];
             }
         }
         else {

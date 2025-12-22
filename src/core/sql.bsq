@@ -2,59 +2,21 @@ namespace Core;
 
 
 namespace SQL{
-	%%NOTE: On JS emission, this behaves as the SQL2 connection object.
+	%% NOTE: During JS emission they work as the mySQL package objects.
 	type Connection_ = Int;
-	%%NOTE: On JS emission, this behaves as an promise failure or any kind of possible failure that
-	%%can be returned by the connection.
 	type Error_ = Int;
+
 	entity SQLConnection{
-		field process: Connection_;
-		field host: String;
-		field user: String;
-
-		async method findDB(db_id:String, connection: Connection_): Bool = sql_checkDB;
-		async method fetchDB(db_id:String, connection: Connection_): SQLDatabase = sql_fetchDB;
-		async method initializeDB(db_id:String, connection:Connection_): SQLDatabase = sql_initializeDB;
-
-		%%TODO: Return Failure.
-		async method createDatabase(db_id: String): SQLDatabase{
-			return this.initializeDB(db_id, this.process);
-		}
-
-		%%TODO: Return Failure.
-		async method getDatabase(db_id : String): SQLDatabase{
-			var found_db = this.findDB(db_id, this.process);
-			if(found_db){
-				return this.fetchDB(db_id,this.process);
-			}else{
-				return this.createDatabase(db_id);
-			}
-		}
-	}
-
-	entity SQLDatabase{
-		field connection: SQLConnection;
-		field id_name: String;
-		field tables: List<SQLTable>;
-
-		method createTable(table_id: String, %*Self connection_id*%){
-			;
-		}
-
-		method findTable(table_id: String, %*Self connection_id*%){
-			;
-		}
 	}
 
 	entity SQLTable{
+		field table_id : String;
+		%%field rows : Map<String,>
 	}
 
-	%%On await rejection return None.
 	async function createConnection(host : String, user : String, password: String): SQLConnection{
-		%%1. Pass all arguments to mysql2.createConnection.
 		let conn_id = XCore::s_sqlConnection<String,Connection_>(host,user,password);
 		let connection = SQLConnection{conn_id,host,user};
 		return connection;
-		%%2. Return SQLConnection entity.
 	}
 }

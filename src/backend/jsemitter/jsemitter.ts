@@ -793,7 +793,9 @@ class JSEmitter {
             }
         }
 
-        return `${EmitNameManager.generateAccssorNameForNamespaceFunction(this.getCurrentNamespace(), cns, ffinv, exp.terms.map((tt) => this.tproc(tt)))}(${argl.join(", ")})`;
+		
+		let async = ffinv.async === "yes" ? "await " : "";
+        return `${async}${EmitNameManager.generateAccssorNameForNamespaceFunction(this.getCurrentNamespace(), cns, ffinv, exp.terms.map((tt) => this.tproc(tt)))}(${argl.join(", ")})`;
     }
     
     private emitCallTypeFunctionExpressionSpecial(exp: CallTypeFunctionExpression, rtrgt: NominalTypeSignature): string {
@@ -944,11 +946,12 @@ class JSEmitter {
         }
 
         if(EmitNameManager.isMethodCallObjectRepr(rtrgt)) {
+			let async = mdecl.async === "yes" ? "await " : "";
             if(exp.terms.length === 0) {
-                return `${val}.${EmitNameManager.generateAccssorNameForMethodImplicit(this.getCurrentNamespace(), rtrgt, mdecl, exp.terms.map((tt) => this.tproc(tt)))}(${argl.join(", ")})`;
+                return `${async}${val}.${EmitNameManager.generateAccssorNameForMethodImplicit(this.getCurrentNamespace(), rtrgt, mdecl, exp.terms.map((tt) => this.tproc(tt)))}(${argl.join(", ")})`;
             }
             else {
-                return `${val}.$scall("${exp.name}", "${EmitNameManager.generateTermKeyFromTermTypes(exp.terms.map((tt) => this.tproc(tt)))}"${argl.length !== 0 ? ", " : ""}${argl.join(", ")})`; 
+                return `${async}${val}.$scall("${exp.name}", "${EmitNameManager.generateTermKeyFromTermTypes(exp.terms.map((tt) => this.tproc(tt)))}"${argl.length !== 0 ? ", " : ""}${argl.join(", ")})`; 
             }
         }
         else {
@@ -1602,11 +1605,12 @@ class JSEmitter {
         }
 
         if(EmitNameManager.isMethodCallObjectRepr(rtrgt)) {
+			let async = mdecl.async === "yes" ? "await " : "";
             if(exp.terms.length === 0) {
-                return `${rcvrval}.${EmitNameManager.generateAccssorNameForMethodImplicit(this.getCurrentNamespace(), rtrgt, mdecl, exp.terms.map((tt) => this.tproc(tt)))}(${argl.join(", ")})`;
+                return `${async}${rcvrval}.${EmitNameManager.generateAccssorNameForMethodImplicit(this.getCurrentNamespace(), rtrgt, mdecl, exp.terms.map((tt) => this.tproc(tt)))}(${argl.join(", ")})`;
             }
             else {
-                return `${rcvrval}.$scall("${exp.name}", "${EmitNameManager.generateTermKeyFromTermTypes(exp.terms.map((tt) => this.tproc(tt)))}"${argl.length !== 0 ? ", " : ""}${argl.join(", ")})`; 
+                return `${async}${rcvrval}.$scall("${exp.name}", "${EmitNameManager.generateTermKeyFromTermTypes(exp.terms.map((tt) => this.tproc(tt)))}"${argl.length !== 0 ? ", " : ""}${argl.join(", ")})`; 
             }
         }
         else {
@@ -2384,16 +2388,6 @@ class JSEmitter {
 					 var val = _$parseBSQON(extracted.types,extracted.value)[0];`;
 			bop = `val`;
 		}
-		else if(bname == "sql_checkDB"){
-			preop = "const [rows] = await connection.query( 'SHOW DATABASES LIKE ?', [db_id]);";
-			bop = "rows.length > 0;";
-		}
-		else if(bname == "sql_fetchDB"){
-			bop = "await connection.query(`USE ${db_id}`)";
-		}
-		else if(bname == "sql_initializeDB"){
-			bop = "await connection.execute(`CREATE DATABASE IF NOT EXISTS ${db_id}`)";
-		}
         else {
             assert(false, `Unknown builtin function -- ${bname}`);
         }
@@ -2682,7 +2676,6 @@ class JSEmitter {
 
 		const async = fdecl.async === "yes" ? "async " : "";
         const [nf, nss] = fdecl instanceof NamespaceFunctionDecl ? EmitNameManager.generateDeclarationNameForNamespaceFunction(this.getCurrentNamespace(), fdecl as NamespaceFunctionDecl, optmapping, async) : [EmitNameManager.generateDeclarationNameForTypeFunction(fdecl as TypeFunctionDecl, optmapping), true];
-		//NOTE: ${nss ? `${async}` : ""} is to add async to namespace functions.
 		const decl = `${nss ? `${async}` : ""}${sig}${nss ? " => " : " "}${body}`;
 
         let bdecl: string;
@@ -2816,7 +2809,8 @@ class JSEmitter {
         this.mapper = omap;
 
         const nf = EmitNameManager.generateDeclarationNameForMethod(rcvrtype[0], mdecl, optmapping);
-        const decl = `function${sig} ${body}`;
+		const async = mdecl.async === "yes" ? "async " : "";
+        const decl = `${async}function${sig} ${body}`;
         let bdecl: string;
         if(optmapping !== undefined) {
             bdecl = `${nf}${decl}`;
@@ -3727,7 +3721,7 @@ class JSEmitter {
             const eexp = this.emitExpression(m.value.exp, true);
             const lexp = `() => ${eexp}`;
 
-            const fmtstyle = inns.isTopNamespace() ? `export /*test 1 */function ${m.name}()` : `${m.name}: () =>`;
+            const fmtstyle = inns.isTopNamespace() ? `export function ${m.name}()` : `${m.name}: () =>`;
             cdecls.push(`${fmtstyle} { return _$memoconstval(_$consts, "${inns.fullnamespace.emit() + "::" + m.name}", ${lexp}); }`);
         }
 
